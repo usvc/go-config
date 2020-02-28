@@ -32,7 +32,7 @@ func (s *IntSliceTests) TestApplyToFlagSet() {
 	intSlice.ApplyToFlagSet("no-shorthand", flagSet)
 	val, err := flagSet.GetIntSlice("no-shorthand")
 	s.Nil(err)
-	s.Equal(int(0), val)
+	s.Equal([]int{}, val)
 
 	intSlice = &IntSlice{Default: []int{-1, -2}}
 	intSlice.ApplyToFlagSet("with-default", flagSet)
@@ -44,5 +44,5 @@ func (s *IntSliceTests) TestApplyToFlagSet() {
 	intSlice.ApplyToFlagSet("with-shorthand", flagSet)
 	val, err = flagSet.GetIntSlice("with-shorthand")
 	s.Nil(err)
-	s.Equal(int(0), val)
+	s.Equal([]int{}, val)
 }
