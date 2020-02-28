@@ -7,7 +7,6 @@ type Float struct {
 	Usage     string
 	Default   float64
 	Value     float64
-	Base
 }
 
 func (s *Float) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
@@ -21,33 +20,34 @@ func (s *Float) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	if value, ok = s.GetDefault().(float64); !ok {
 		value = *new(float64)
 	}
-	if pointer, ok = s.GetValuePointer().(*float64); ok {
-		if isZeroValue(shorthand) {
-			flags.Float64Var(pointer, name, value, usage)
-		} else {
-			flags.Float64VarP(pointer, name, shorthand, value, usage)
-		}
+	pointer = s.GetValuePointer().(*float64)
+	if isZeroValue(shorthand) {
+		flags.Float64Var(pointer, name, value, usage)
 	} else {
-		if isZeroValue(shorthand) {
-			flags.Float64P(name, shorthand, value, usage)
-		} else {
-			flags.Float64(name, value, usage)
-		}
+		flags.Float64VarP(pointer, name, shorthand, value, usage)
 	}
 }
 
-func (f *Float) GetDefault() interface{} {
-	return f.Default
+func (s *Float) GetDefault() interface{} {
+	return s.Default
 }
 
-func (f *Float) GetValuePointer() interface{} {
-	return &f.Value
+func (s *Float) GetShorthand() string {
+	return s.Shorthand
 }
 
-func (f *Float) GetValue() interface{} {
-	return f.Value
+func (s *Float) GetUsage() string {
+	return s.Usage
 }
 
-func (f *Float) SetValue(value interface{}) {
-	f.Value = value.(float64)
+func (s *Float) GetValuePointer() interface{} {
+	return &s.Value
+}
+
+func (s *Float) GetValue() interface{} {
+	return s.Value
+}
+
+func (s *Float) SetValue(value interface{}) {
+	s.Value = value.(float64)
 }

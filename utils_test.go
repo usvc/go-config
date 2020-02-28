@@ -14,6 +14,50 @@ func TestUtils(t *testing.T) {
 	suite.Run(t, new(UtilsTests))
 }
 
+func (s *UtilsTests) Test_areEqualStringSlice_equal() {
+	var equalStringSlices = [][][]string{
+		[][]string{[]string{"a", "b"}, []string{"a", "b"}},
+		[][]string{[]string{"1", "2"}, []string{"1", "2"}},
+	}
+	for _, cases := range equalStringSlices {
+		s.True(areEqualStringSlice(cases[0], cases[1]))
+	}
+}
+
+func (s *UtilsTests) Test_areEqualStringSlice_unequalLength() {
+	var unequalStringSlices = [][][]string{
+		[][]string{[]string{"a"}, []string{"a", "b"}},
+		[][]string{[]string{"1"}, []string{"1", "2"}},
+	}
+	for _, cases := range unequalStringSlices {
+		s.False(areEqualStringSlice(cases[0], cases[1]))
+	}
+}
+
+func (s *UtilsTests) Test_areEqualStringSlice_unequalValue() {
+	var unequalStringSlices = [][][]string{
+		[][]string{[]string{"a", "2"}, []string{"a", "b"}},
+		[][]string{[]string{"1", "b"}, []string{"1", "2"}},
+	}
+	for _, cases := range unequalStringSlices {
+		s.False(areEqualStringSlice(cases[0], cases[1]))
+	}
+}
+
+func (s *UtilsTests) Test_isZeroValue() {
+	var boolValue bool
+	s.True(isZeroValue(boolValue))
+	var intValue int
+	s.True(isZeroValue(intValue))
+	var stringValue string
+	s.True(isZeroValue(stringValue))
+	var uintValue uint
+	s.True(isZeroValue(uintValue))
+	var float64Value float64
+	s.True(isZeroValue(float64Value))
+	s.True(isZeroValue(nil))
+}
+
 func (s *UtilsTests) Test_normalizeName_cases() {
 	testCases := map[string]string{
 		"abcd": "abcd",

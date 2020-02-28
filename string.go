@@ -9,7 +9,6 @@ type String struct {
 	Usage     string
 	Default   string
 	Value     string
-	Base
 }
 
 func (s *String) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
@@ -23,27 +22,28 @@ func (s *String) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	if value, ok = s.GetDefault().(string); !ok {
 		value = *new(string)
 	}
-	if pointer, ok = s.GetValuePointer().(*string); ok {
-		if isZeroValue(shorthand) {
-			flags.StringVar(pointer, name, value, usage)
-		} else {
-			flags.StringVarP(pointer, name, shorthand, value, usage)
-		}
+	pointer = s.GetValuePointer().(*string)
+	if isZeroValue(shorthand) {
+		flags.StringVar(pointer, name, value, usage)
 	} else {
-		if isZeroValue(shorthand) {
-			flags.StringP(name, shorthand, value, usage)
-		} else {
-			flags.String(name, value, usage)
-		}
+		flags.StringVarP(pointer, name, shorthand, value, usage)
 	}
-}
-
-func (s *String) GetValuePointer() interface{} {
-	return &s.Value
 }
 
 func (s *String) GetDefault() interface{} {
 	return s.Default
+}
+
+func (s *String) GetShorthand() string {
+	return s.Shorthand
+}
+
+func (s *String) GetUsage() string {
+	return s.Usage
+}
+
+func (s *String) GetValuePointer() interface{} {
+	return &s.Value
 }
 
 func (s *String) GetValue() interface{} {

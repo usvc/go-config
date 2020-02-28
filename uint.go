@@ -7,7 +7,6 @@ type Uint struct {
 	Usage     string
 	Default   uint
 	Value     uint
-	Base
 }
 
 func (s *Uint) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
@@ -21,31 +20,32 @@ func (s *Uint) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	if value, ok = s.GetDefault().(uint); !ok {
 		value = *new(uint)
 	}
-	if pointer, ok = s.GetValuePointer().(*uint); ok {
-		if isZeroValue(shorthand) {
-			flags.UintVar(pointer, name, value, usage)
-		} else {
-			flags.UintVarP(pointer, name, shorthand, value, usage)
-		}
+	pointer = s.GetValuePointer().(*uint)
+	if isZeroValue(shorthand) {
+		flags.UintVar(pointer, name, value, usage)
 	} else {
-		if isZeroValue(shorthand) {
-			flags.UintP(name, shorthand, value, usage)
-		} else {
-			flags.Uint(name, value, usage)
-		}
+		flags.UintVarP(pointer, name, shorthand, value, usage)
 	}
 }
 
-func (u *Uint) GetDefault() interface{} {
-	return u.Default
+func (s *Uint) GetDefault() interface{} {
+	return s.Default
 }
 
-func (u *Uint) GetValuePointer() interface{} {
-	return &u.Value
+func (s *Uint) GetShorthand() string {
+	return s.Shorthand
 }
 
-func (u *Uint) GetValue() interface{} {
-	return u.Value
+func (s *Uint) GetUsage() string {
+	return s.Usage
+}
+
+func (s *Uint) GetValuePointer() interface{} {
+	return &s.Value
+}
+
+func (s *Uint) GetValue() interface{} {
+	return s.Value
 }
 
 func (s *Uint) SetValue(value interface{}) {

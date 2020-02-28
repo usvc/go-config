@@ -7,7 +7,6 @@ type IntSlice struct {
 	Usage     string
 	Default   []int
 	Value     []int
-	Base
 }
 
 func (s *IntSlice) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
@@ -21,31 +20,32 @@ func (s *IntSlice) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	if value, ok = s.GetDefault().([]int); !ok {
 		value = *new([]int)
 	}
-	if pointer, ok = s.GetValuePointer().(*[]int); ok {
-		if isZeroValue(shorthand) {
-			flags.IntSliceVar(pointer, name, value, usage)
-		} else {
-			flags.IntSliceVarP(pointer, name, shorthand, value, usage)
-		}
+	pointer = s.GetValuePointer().(*[]int)
+	if isZeroValue(shorthand) {
+		flags.IntSliceVar(pointer, name, value, usage)
 	} else {
-		if isZeroValue(shorthand) {
-			flags.IntSliceP(name, shorthand, value, usage)
-		} else {
-			flags.IntSlice(name, value, usage)
-		}
+		flags.IntSliceVarP(pointer, name, shorthand, value, usage)
 	}
 }
 
-func (u *IntSlice) GetDefault() interface{} {
-	return u.Default
+func (s *IntSlice) GetDefault() interface{} {
+	return s.Default
 }
 
-func (u *IntSlice) GetValuePointer() interface{} {
-	return &u.Value
+func (s *IntSlice) GetShorthand() string {
+	return s.Shorthand
 }
 
-func (u *IntSlice) GetValue() interface{} {
-	return u.Value
+func (s *IntSlice) GetUsage() string {
+	return s.Usage
+}
+
+func (s *IntSlice) GetValuePointer() interface{} {
+	return &s.Value
+}
+
+func (s *IntSlice) GetValue() interface{} {
+	return s.Value
 }
 
 func (s *IntSlice) SetValue(value interface{}) {
