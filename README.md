@@ -5,6 +5,21 @@
 
 A Go package to deal with configurations easily.
 
+- [Config](#config)
+  - [Usage](#usage)
+    - [Importing](#importing)
+    - [Defining configuration](#defining-configuration)
+    - [Consuming from environment](#consuming-from-environment)
+    - [Applying to Cobra (`github.com/spf13/cobra` package)](#applying-to-cobra-githubcomspf13cobra-package)
+    - [Deciding environment/flag precedence](#deciding-environmentflag-precedence)
+    - [Retrieving values frrom the configuration](#retrieving-values-frrom-the-configuration)
+    - [Note on `*`Slice types](#note-on-slice-types)
+    - [Note on configuration names](#note-on-configuration-names)
+  - [Development Runbook](#development-runbook)
+    - [Getting Started](#getting-started)
+    - [Continuous Integration (CI) Pipeline](#continuous-integration-ci-pipeline)
+  - [Licensing](#licensing)
+
 ## Usage
 
 ### Importing
@@ -144,6 +159,14 @@ fmt.Println("[]uint   : %v", conf.GetValue())
 ### Note on `*`Slice types
 
 For the slice types (`IntSlice`, `StringSlice`, `UintSlice`), when running in flag mode, the delimiter is a comma (`,`), but in environment variable mode, the delimiter is a space (` `). This is because of how the underlying package (`github.com/spf13/viper`) does the string splitting.
+
+### Note on configuration names
+
+The `config.Map` is used to define a dictionary of your configuration values using a `map[string]config.Config` data structure. The `string` becomes the name of the configuration and this `string` is manipulated before being passed to the downstream library.
+
+For environment variables, all non-alphanumeric characters will be converted to an underscore (`_`), and all alphabetic characters will be converted to `UPPERCASE_IN_SNAKE_CASE`.
+
+For flags, all non-alphanumeric characters will be converted to a hypen (`-`), and all alphabetic characters will be converted to `lowercase-in-kebab-case`.
 
 ## Development Runbook
 

@@ -23,9 +23,9 @@ build_production:
 			-s -w" \
 		-o ./bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT} \
 		./cmd/$(CMD_ROOT)
-	rm -rf ./bin/$(CMD_ROOT)
-	ln -s $$(pwd)/bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT} \
-		./bin/$(CMD_ROOT)
+	rm -rf ./bin/$(CMD_ROOT)${BIN_EXT}
+	cp ./bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT} \
+		./bin/${CMD_ROOT}${BIN_EXT}
 
 package:
 	docker build --file ./deploy/Dockerfile --tag $(DOCKER_NAMESPACE)/$(DOCKER_IMAGE_NAME):latest .
