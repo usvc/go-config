@@ -1,8 +1,6 @@
 package config
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -11,50 +9,52 @@ type Map map[string]Config
 
 func (m *Map) ApplyToCobra(command *cobra.Command) {
 	flags := command.Flags()
-	for name, conf := range *m {
-		conf.ApplyToFlagSet(name, flags)
+	for rawFlagString, conf := range *m {
+		flagString := normalizeName(rawFlagString, separatorFlag)
+		conf.ApplyToFlagSet(flagString, flags)
 	}
 }
 
 func (m *Map) GetFromEnvironment() {
 	env := viper.New()
-	for key, conf := range *m {
+	for rawEnvKey, conf := range *m {
+		envKey := normalizeName(rawEnvKey, separatorEnv)
 		if conf.GetDefault() != nil {
-			fmt.Println("setting default for", key)
-			env.SetDefault(key, conf.GetDefault())
+			env.SetDefault(envKey, conf.GetDefault())
 		}
 	}
 	env.AutomaticEnv()
-	for key, conf := range *m {
+	for rawEnvKey, conf := range *m {
+		envKey := normalizeName(rawEnvKey, separatorEnv)
 		defaultValue := conf.GetDefault()
 		switch conf.(type) {
 		case *String:
-			envValue := env.GetString(key)
+			envValue := env.GetString(envKey)
 			if envValue != defaultValue {
 				conf.SetValue(envValue)
 			}
 		case *StringSlice:
-			envValue := env.GetStringSlice(key)
-			if envValue != nil {
+			envValue := env.GetStringSlice(envKey)
+			if envValue != nil && !areEqualStringSlice(envValue, defaultValue.([]string)) {
 				conf.SetValue(envValue)
 			}
 		case *Int:
-			envValue := env.GetInt(key)
+			envValue := env.GetInt(envKey)
 			if envValue != defaultValue {
 				conf.SetValue(envValue)
 			}
 		case *Uint:
-			envValue := env.GetUint(key)
+			envValue := env.GetUint(envKey)
 			if envValue != defaultValue {
 				conf.SetValue(envValue)
 			}
 		case *Float:
-			envValue := env.GetFloat64(key)
+			envValue := env.GetFloat64(envKey)
 			if envValue != defaultValue {
 				conf.SetValue(envValue)
 			}
 		case *Bool:
-			envValue := env.GetBool(key)
+			envValue := env.GetBool(envKey)
 			if envValue != defaultValue {
 				conf.SetValue(envValue)
 			}

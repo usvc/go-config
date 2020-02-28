@@ -5,8 +5,10 @@ import (
 )
 
 type String struct {
-	Default string
-	Value   string
+	Shorthand string
+	Usage     string
+	Default   string
+	Value     string
 	Base
 }
 

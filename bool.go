@@ -3,8 +3,10 @@ package config
 import "github.com/spf13/pflag"
 
 type Bool struct {
-	Default bool
-	Value   bool
+	Shorthand string
+	Usage     string
+	Default   bool
+	Value     bool
 	Base
 }
 

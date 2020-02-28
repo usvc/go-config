@@ -3,8 +3,10 @@ package config
 import "github.com/spf13/pflag"
 
 type Int struct {
-	Default int
-	Value   int
+	Shorthand string
+	Usage     string
+	Default   int
+	Value     int
 	Base
 }
 

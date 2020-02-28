@@ -3,8 +3,10 @@ package config
 import "github.com/spf13/pflag"
 
 type UintSlice struct {
-	Default []uint
-	Value   []uint
+	Shorthand string
+	Usage     string
+	Default   []uint
+	Value     []uint
 	Base
 }
 

@@ -1,10 +1,14 @@
 package config
 
-import "github.com/spf13/pflag"
+import (
+	"github.com/spf13/pflag"
+)
 
 type StringSlice struct {
-	Default []string
-	Value   []string
+	Shorthand string
+	Usage     string
+	Default   []string
+	Value     []string
 	Base
 }
 
