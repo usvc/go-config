@@ -16,8 +16,6 @@ func TestConfig(t *testing.T) {
 
 func (s *ConfigTests) TestTypes() {
 	var conf Config
-	conf = &Bool{}
-	conf = &Float{}
 	conf = &Int{}
 	conf = &IntSlice{}
 	conf = &String{}

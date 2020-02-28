@@ -29,10 +29,6 @@ func (s *Bool) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	}
 }
 
-func (s *Bool) GetValuePointer() interface{} {
-	return &s.Value
-}
-
 func (s *Bool) GetDefault() interface{} {
 	return s.Default
 }
@@ -43,6 +39,10 @@ func (s *Bool) GetShorthand() string {
 
 func (s *Bool) GetUsage() string {
 	return s.Usage
+}
+
+func (s *Bool) GetValuePointer() interface{} {
+	return &s.Value
 }
 
 func (s *Bool) GetValue() interface{} {

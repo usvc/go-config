@@ -15,6 +15,17 @@ func TestBool(t *testing.T) {
 	suite.Run(t, new(BoolTests))
 }
 
+func (s *BoolTests) TestInterface() {
+	var conf Config
+	b := Bool{}
+	conf = &b
+	s.Equal(conf.GetValue(), b.Value)
+	s.Equal(conf.GetValuePointer(), &b.Value)
+	s.Equal(conf.GetDefault(), b.Default)
+	s.Equal(conf.GetUsage(), b.Usage)
+	s.Equal(conf.GetShorthand(), b.Shorthand)
+}
+
 func (s *BoolTests) TestApplyToFlagSet() {
 	flagSet := &pflag.FlagSet{}
 	boolConf := &Bool{}
