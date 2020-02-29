@@ -7,7 +7,7 @@ git:
   quiet: false
 deploy:
   provider: releases
-  api_key: ${RELEASE_TOKEN}
+  api_key: "${RELEASE_TOKEN}"
   file_glob: true
   file: ./bin/*
   skip_cleanup: true
