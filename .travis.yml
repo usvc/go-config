@@ -15,7 +15,7 @@ deploy:
     branch: master
     tags: true
 script:
-  - make dep
+  - make deps
   - GOOS=linux GOARCH=amd64 make build_compressed_production
   - GOOS=darwin GOARCH=amd64 make build_compressed_production
   - GOOS=windows GOARCH=386 BIN_EXT=.exe make build_compressed_production
