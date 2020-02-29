@@ -1,10 +1,11 @@
 sudo: required
-language: go
-go:
-  - 1.14.x
 git:
   submodules: true
   quiet: false
+language: go
+go:
+  - 1.14.x
+if: tag IS present
 deploy:
   provider: releases
   api_key: "${RELEASE_TOKEN}"
@@ -12,6 +13,7 @@ deploy:
   file: ./bin/*
   skip_cleanup: true
   on:
+    branch: master
     tags: true
 before_script:
   - sudo apt-get update
