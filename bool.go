@@ -1,8 +1,6 @@
 package config
 
 import (
-	"fmt"
-
 	"github.com/spf13/pflag"
 )
 
@@ -21,10 +19,8 @@ func (s *Bool) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 		usage     = s.GetUsage()
 	)
 	if isZeroValue(shorthand) {
-		fmt.Print("reached 2")
 		flags.BoolVar(pointer, name, value, usage)
 	} else {
-		fmt.Print("reached 3")
 		flags.BoolVarP(pointer, name, shorthand, value, usage)
 	}
 }

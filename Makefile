@@ -34,7 +34,14 @@ compress_production:
 	upx -t ./bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT}
 
 image:
-	docker build --file ./deploy/Dockerfile --tag $(DOCKER_NAMESPACE)/$(DOCKER_IMAGE_NAME):latest .
+	docker build \
+		--file ./deploy/Dockerfile \
+		--tag $(DOCKER_NAMESPACE)/$(DOCKER_IMAGE_NAME):latest \
+		.
+test_image:
+	container-structure-test test \
+		--config ./deploy/Dockerfile.yaml \
+		--image $(DOCKER_NAMESPACE)/$(DOCKER_IMAGE_NAME):latest
 save:
 	mkdir -p ./build
 	docker save --output ./build/$(PROJECT_NAME).tar.gz $(DOCKER_NAMESPACE)/$(DOCKER_IMAGE_NAME):latest

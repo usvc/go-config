@@ -1,13 +1,14 @@
 image: golang:1.14
 stages:
+  - init
   - test
   - build
-  - package
   - release
+  - package
   - publish
 
-test:
-  stage: test
+init:
+  stage: init
   cache:
     key: ${CI_PROJECT_REF}_${CI_COMMIT_REF_NAME}
     paths:
@@ -16,64 +17,48 @@ test:
     expire_in: 1 day
     paths:
       - ./vendor
+  before_script:
+    - apt-get update && apt-get upgrade -y
+    - apt-get install -y g++ git make
+  script:
+    - make deps
+
+test:
+  stage: test
+  dependencies:
+    - init
+  artifacts:
+    expire_in: 1 day
+    paths:
       - ./c.out
   before_script:
     - apt-get update && apt-get upgrade -y
     - apt-get install -y make g++
   script:
-    - make deps
     - make test
 
-build:
-  stage: build
-  artifacts:
-    expire_in: 1 day
-    paths:
-      - ./bin/*
+.build:
   before_script:
     - apt-get update && apt-get upgrade -y
-    - apt-get install -y make git g++
+    - apt-get install -y g++ git make
   script:
+    - git fetch
     - GOOS=linux GOARCH=amd64 make build_production
     - GOOS=darwin GOARCH=amd64 make build_production
     - GOOS=windows GOARCH=386 BIN_EXT=.exe make build_production
 
-compress:
-  stage: package
-  # allow failure because it's not necessary to always compress
-  # even though that would be nice
-  allow_failure: true
-  dependencies:
-    - build
+test build:
+  extends: .build
+  stage: test
+
+build:
+  extends: .build
+  only:
+    - tags
   artifacts:
     expire_in: 1 day
     paths:
       - ./bin/*
-  before_script:
-    - apt-get update && apt-get upgrade -y
-    - apt-get install -y make g++ upx
-  script:
-    - set +e
-    - GOOS=linux GOARCH=amd64 make compress_production
-    - GOOS=darwin GOARCH=amd64 make compress_production
-    - GOOS=windows GOARCH=386 BIN_EXT=.exe make compress_production
-
-dockerize:
-  stage: package
-  services:
-    - docker:19.03.1-dind
-  image: docker:19.03.1
-  dependencies:
-    - build
-  artifacts:
-    expire_in: 1 day
-    paths:
-      - ./build/*
-  before_script:
-    - apk add git jq make
-  script:
-    - make image
-    - make save
 
 version bump:
   stage: release
@@ -96,15 +81,56 @@ version bump:
   after_script:
     - rm -rf ~/.ssh/*
 
+compress:
+  stage: package
+  only:
+    - tags
+  # allow failure because it's not necessary to always compress
+  # even though that would be nice
+  allow_failure: true
+  dependencies:
+    - build
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - ./bin/*
+  before_script:
+    - apt-get update && apt-get upgrade -y
+    - apt-get install -y make g++ upx
+  script:
+    - set +e
+    - GOOS=linux GOARCH=amd64 make compress_production
+    - GOOS=darwin GOARCH=amd64 make compress_production
+    - GOOS=windows GOARCH=386 BIN_EXT=.exe make compress_production
+
+dockerize:
+  stage: package
+  only:
+    - tags
+  services:
+    - docker:19.03.1-dind
+  image: docker:19.03.1
+  dependencies:
+    - build
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - ./build/*
+  before_script:
+    - apk add git jq make
+  script:
+    - make image test_image
+    - make save
+
 dockerhub:
   stage: publish
+  only:
+    - tags
   services:
     - docker:19.03.1-dind
   image: docker:19.03.1
   dependencies:
     - dockerize
-  only:
-    - tags
   before_script:
     - apk add git jq make
     - docker login ${DOCKER_REGISTRY_URL:-docker.io} -u ${DOCKER_REGISTRY_USERNAME} -p ${DOCKER_REGISTRY_PASSWORD}

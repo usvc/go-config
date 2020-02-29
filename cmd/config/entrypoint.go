@@ -6,9 +6,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	Version   string
+	Commit    string
+	Timestamp string
+)
+
 func main() {
 	rootCommand := cobra.Command{
-		Use: "config",
+		Use:     "config",
+		Version: fmt.Sprintf("%s-%s %s", Version, Commit, Timestamp),
 		PreRun: func(command *cobra.Command, args []string) {
 			conf.GetFromEnvironment()
 		},
