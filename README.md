@@ -19,8 +19,11 @@ A Go package to deal with configuration.
 	- [Development Runbook](#development-runbook)
 		- [Getting Started](#getting-started)
 		- [Continuous Integration (CI) Pipeline](#continuous-integration-ci-pipeline)
-			- [Version Bumping](#version-bumping)
-			- [DockerHub Publishing](#dockerhub-publishing)
+			- [On Github](#on-github)
+				- [Releasing](#releasing)
+			- [On Gitlab](#on-gitlab)
+				- [Version Bumping](#version-bumping)
+				- [DockerHub Publishing](#dockerhub-publishing)
 	- [Licensing](#licensing)
 
 ## Usage
@@ -221,9 +224,25 @@ UINT_SLICE="12345 67890" go run ./cmd/config
 
 ### Continuous Integration (CI) Pipeline
 
-To set up the CI pipeline in Gitlab:
+#### On Github
 
-#### Version Bumping
+Github is used to deploy binaries/libraries because of it's ease of access by other developers.
+
+##### Releasing
+
+Releasing of the binaries can be done via Travis CI.
+
+1. On Github, navigate to the [tokens settings page](https://github.com/settings/tokens) (by clicking on your profile picture, selecting **Settings**, selecting **Developer settings** on the left navigation menu, then **Personal Access Tokens** again on the left navigation menu)
+2. Click on **Generate new token**, give the token an appropriate name and check the checkbox on **`public_repo`** within the **repo** header
+3. Copy the generated token
+4. Navigate to [travis-ci.org](https://travis-ci.org) and access the cooresponding repository there. Click on the **More options** button on the top right of the repository page and select **Settings**
+5. Scroll down to the section on **Environment Variables** and enter in a new **NAME** with `RELEASE_TOKEN` and the **VALUE** field cooresponding to the generated personal access token, and hit **Add**
+
+#### On Gitlab
+
+Gitlab is used to run tests and ensure that builds run correctly.
+
+##### Version Bumping
 
 1. Run `make .ssh`
 2. Copy the contents of the file generated at `./.ssh/id_rsa.base64` into an environment variable named **`DEPLOY_KEY`** in **Settings > CI/CD > Variables**
@@ -231,7 +250,7 @@ To set up the CI pipeline in Gitlab:
 
 - **`DEPLOY_KEY`**: generate this by running `make .ssh` and copying the contents of the file generated at `./.ssh/id_rsa.base64`
 
-#### DockerHub Publishing
+##### DockerHub Publishing
 
 1. Login to [https://hub.docker.com](https://hub.docker.com), or if you're using your own private one, log into yours
 2. Navigate to [your security settings at the `/settings/security` endpoint](https://hub.docker.com/settings/security)
