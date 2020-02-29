@@ -34,9 +34,9 @@ build:
     - apt-get update && apt-get upgrade -y
     - apt-get install -y make git g++
   script:
-    - GOOS=linux GOARCH=amd64 make build_production \
-      & GOOS=darwin GOARCH=amd64 make build_production \
-      & GOOS=windows GOARCH=386 BIN_EXT=.exe make build_production
+    - GOOS=linux GOARCH=amd64 make build_production
+    - GOOS=darwin GOARCH=amd64 make build_production
+    - GOOS=windows GOARCH=386 BIN_EXT=.exe make build_production
 
 compress:
   stage: package
