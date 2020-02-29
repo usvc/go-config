@@ -1,5 +1,7 @@
 PROJECT_NAME=config
 CMD_ROOT=config
+DOCKER_NAMESPACE=usvc
+DOCKER_IMAGE_NAME=libeg-config
 
 -include ./makefile.properties
 
@@ -31,15 +33,19 @@ compress_production:
 	upx -9 -v ./bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT}
 	upx -t ./bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT}
 
-package:
+image:
 	docker build --file ./deploy/Dockerfile --tag $(DOCKER_NAMESPACE)/$(DOCKER_IMAGE_NAME):latest .
 save:
 	mkdir -p ./build
 	docker save --output ./build/$(PROJECT_NAME).tar.gz $(DOCKER_NAMESPACE)/$(DOCKER_IMAGE_NAME):latest
 load:
 	docker load --input ./build/$(PROJECT_NAME).tar.gz
-publish_dockerhub:
+dockerhub:
 	docker push $(DOCKER_NAMESPACE)/$(DOCKER_IMAGE_NAME):latest
+	git fetch
+	docker tag $(DOCKER_NAMESPACE)/$(DOCKER_IMAGE_NAME):latest \
+		$(DOCKER_NAMESPACE)/$(DOCKER_IMAGE_NAME):$$(git describe --tag $$(git rev-list --tags --max-count=1))
+	docker push $(DOCKER_NAMESPACE)/$(DOCKER_IMAGE_NAME):$$(git describe --tag $$(git rev-list --tags --max-count=1))
 
 see_ci:
 	xdg-open https://gitlab.com/usvc/modules/go/config/pipelines

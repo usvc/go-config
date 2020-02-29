@@ -1,4 +1,4 @@
-image: golang:1.13
+image: golang:1.14
 stages:
   - test
   - build
@@ -57,6 +57,23 @@ compress:
       & GOOS=darwin GOARCH=amd64 make compress_production \
       & GOOS=windows GOARCH=386 BIN_EXT=.exe make compress_production
 
+dockerize:
+  stage: package
+  services:
+    - docker:19.03.1-dind
+  dependencies:
+    - build
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - ./build/*
+  before_script:
+    - apt-get update && apt-get upgrade -y
+    - apt-get install -y make g++ docker-ce
+  script:
+    - make image
+    - make save
+
 version bump:
   stage: release
   only:
@@ -77,3 +94,22 @@ version bump:
     - git push origin master --verbose --tags
   after_script:
     - rm -rf ~/.ssh/*
+
+dockerhub:
+  stage: publish
+  services:
+    - docker:19.03.1-dind
+  dependencies:
+    - dockerize
+  only:
+    - tags
+  before_script:
+    - apt-get update && apt-get upgrade -y
+    - apt-get install -y make git g++ docker-ce
+    - docker login ${DOCKER_REGISTRY_URL:-docker.io} -u ${DOCKER_REGISTRY_USERNAME} -p ${DOCKER_REGISTRY_PASSWORD}
+  script:
+    - make load
+    - make dockerhub
+  after_script:
+    - docker logout
+    - rm -rf ~/.docker/config.json

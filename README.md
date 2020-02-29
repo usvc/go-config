@@ -19,6 +19,8 @@ A Go package to deal with configuration.
 	- [Development Runbook](#development-runbook)
 		- [Getting Started](#getting-started)
 		- [Continuous Integration (CI) Pipeline](#continuous-integration-ci-pipeline)
+			- [Version Bumping](#version-bumping)
+			- [DockerHub Publishing](#dockerhub-publishing)
 	- [Licensing](#licensing)
 
 ## Usage
@@ -221,11 +223,25 @@ UINT_SLICE="12345 67890" go run ./cmd/config
 
 To set up the CI pipeline in Gitlab:
 
+#### Version Bumping
+
 1. Run `make .ssh`
 2. Copy the contents of the file generated at `./.ssh/id_rsa.base64` into an environment variable named **`DEPLOY_KEY`** in **Settings > CI/CD > Variables**
 3. Navigate to the **Deploy Keys** section of the **Settings > Repository > Deploy Keys** and paste in the contents of the file generated at `./.ssh/id_rsa.pub` with the **Write access allowed** checkbox enabled
 
 - **`DEPLOY_KEY`**: generate this by running `make .ssh` and copying the contents of the file generated at `./.ssh/id_rsa.base64`
+
+#### DockerHub Publishing
+
+1. Login to [https://hub.docker.com](https://hub.docker.com), or if you're using your own private one, log into yours
+2. Navigate to [your security settings at the `/settings/security` endpoint](https://hub.docker.com/settings/security)
+3. Click on **Create Access Token**, type in a name for the new token, and click on **Create**
+4. Copy the generated token that will be displayed on the screen
+5. Enter the following varialbes into the CI/CD Variables page at **Settings > CI/CD > Variables** in your Gitlab repository:
+
+- **`DOCKER_REGISTRY_URL`**: The hostname of the Docker registry (defaults to `docker.io` if not specified)
+- **`DOCKER_REGISTRY_USERNAME`**: The username you used to login to the Docker registry
+- **`DOCKER_REGISTRY_PASSWORD`**: The generated access token
 
 ## Licensing
 
