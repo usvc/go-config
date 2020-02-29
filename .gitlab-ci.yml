@@ -53,6 +53,7 @@ compress:
     - apt-get update && apt-get upgrade -y
     - apt-get install -y make g++ upx
   script:
+    - set +e
     - GOOS=linux GOARCH=amd64 make compress_production
     - GOOS=darwin GOARCH=amd64 make compress_production
     - GOOS=windows GOARCH=386 BIN_EXT=.exe make compress_production
