@@ -50,9 +50,12 @@ test:
 test build:
   extends: .build
   stage: test
+  only:
+    - master
 
 build:
   extends: .build
+  stage: build
   only:
     - tags
   artifacts:
