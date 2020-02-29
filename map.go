@@ -61,3 +61,35 @@ func (m *Map) GetFromEnvironment() {
 		}
 	}
 }
+
+func (m Map) GetBool(id string) bool {
+	return m[id].GetValue().(bool)
+}
+
+func (m Map) GetFloat(id string) float64 {
+	return m[id].GetValue().(float64)
+}
+
+func (m Map) GetInt(id string) int {
+	return m[id].GetValue().(int)
+}
+
+func (m Map) GetIntSlice(id string) []int {
+	return m[id].GetValue().([]int)
+}
+
+func (m Map) GetString(id string) string {
+	return m[id].GetValue().(string)
+}
+
+func (m Map) GetStringSlice(id string) []string {
+	return m[id].GetValue().([]string)
+}
+
+func (m Map) GetUint(id string) uint {
+	return m[id].GetValue().(uint)
+}
+
+func (m Map) GetUintSlice(id string) []uint {
+	return m[id].GetValue().([]uint)
+}
