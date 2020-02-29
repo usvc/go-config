@@ -2,8 +2,8 @@ image: golang:1.13
 stages:
   - test
   - build
-  - release
   - package
+  - release
   - publish
 
 test:
@@ -18,7 +18,7 @@ test:
       - ./vendor
       - ./c.out
   before_script:
-    - apt-get update
+    - apt-get update && apt-get upgrade -y
     - apt-get install -y make g++
   script:
     - make deps
@@ -31,12 +31,26 @@ build:
     paths:
       - ./bin/*
   before_script:
-    - apt-get update
-    - apt-get install -y make git g++ upx
+    - apt-get update && apt-get upgrade -y
+    - apt-get install -y make git g++
   script:
     - GOOS=linux GOARCH=amd64 make build_production
     - GOOS=darwin GOARCH=amd64 make build_production
     - GOOS=windows GOARCH=386 BIN_EXT=.exe make build_production
+
+compress:
+  stage: package
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - ./bin/*
+  before_script:
+    - apt-get update && apt-get upgrade -y
+    - apt-get install -y make g++ upx
+  script:
+    - GOOS=linux GOARCH=amd64 make compress_production
+    - GOOS=darwin GOARCH=amd64 make compress_production
+    - GOOS=windows GOARCH=386 BIN_EXT=.exe make compress_production
 
 version bump:
   stage: release
@@ -44,6 +58,7 @@ version bump:
     - master
   image: usvc/semver:gitlab-latest
   before_script:
+    - apk update && apk upgrade
     - apk add openssh
     - mkdir -p ~/.ssh
     - 'printf -- "${DEPLOY_KEY}" | base64 -d > ~/.ssh/id_rsa'
