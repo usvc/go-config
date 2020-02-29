@@ -1,4 +1,7 @@
 sudo: required
+language: go
+go:
+  - 1.14.x
 git:
   submodules: true
   quiet: false
@@ -11,10 +14,11 @@ deploy:
   on:
     branch: master
     tags: true
+before_script:
+  - sudo apt-get update
+  - sudo apt-get upgrade -y
+  - sudo apt-get install -y make git g++
 script:
-  - apt-get update
-  - apt-get upgrade -y
-  - apt-get install -y make git g++
   - make deps
   - GOOS=linux GOARCH=amd64 make build_production
   - GOOS=darwin GOARCH=amd64 make build_production
