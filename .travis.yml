@@ -16,7 +16,7 @@ deploy:
     tags: true
 before_script:
   - sudo apt-get update
-  - sudo apt-get install -y make git g++
+  - sudo apt-get install -y make git g++ upx
 script:
   - make deps
   - GOOS=linux GOARCH=amd64 make build_production \
