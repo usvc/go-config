@@ -34,12 +34,17 @@ build:
     - apt-get update && apt-get upgrade -y
     - apt-get install -y make git g++
   script:
-    - GOOS=linux GOARCH=amd64 make build_production
-    - GOOS=darwin GOARCH=amd64 make build_production
-    - GOOS=windows GOARCH=386 BIN_EXT=.exe make build_production
+    - GOOS=linux GOARCH=amd64 make build_production \
+      & GOOS=darwin GOARCH=amd64 make build_production \
+      & GOOS=windows GOARCH=386 BIN_EXT=.exe make build_production
 
 compress:
   stage: package
+  # allow failure because it's not necessary to always compress
+  # even though that would be nice
+  allow_failure: true
+  dependencies:
+    - build
   artifacts:
     expire_in: 1 day
     paths:
@@ -48,9 +53,9 @@ compress:
     - apt-get update && apt-get upgrade -y
     - apt-get install -y make g++ upx
   script:
-    - GOOS=linux GOARCH=amd64 make compress_production
-    - GOOS=darwin GOARCH=amd64 make compress_production
-    - GOOS=windows GOARCH=386 BIN_EXT=.exe make compress_production
+    - GOOS=linux GOARCH=amd64 make compress_production \
+      & GOOS=darwin GOARCH=amd64 make compress_production \
+      & GOOS=windows GOARCH=386 BIN_EXT=.exe make compress_production
 
 version bump:
   stage: release
