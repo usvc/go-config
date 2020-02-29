@@ -42,7 +42,7 @@ version bump:
   stage: release
   only:
     - master
-  image: usvc/semver:gitlab-0.3.26
+  image: usvc/semver:gitlab-latest
   before_script:
     - apk add openssh
     - mkdir -p ~/.ssh
