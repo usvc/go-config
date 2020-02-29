@@ -61,6 +61,7 @@ dockerize:
   stage: package
   services:
     - docker:19.03.1-dind
+  image: docker:19.03.1
   dependencies:
     - build
   artifacts:
@@ -68,8 +69,7 @@ dockerize:
     paths:
       - ./build/*
   before_script:
-    - apt-get update && apt-get upgrade -y
-    - apt-get install -y make g++ docker-ce
+    - apk add git jq make
   script:
     - make image
     - make save
@@ -99,13 +99,13 @@ dockerhub:
   stage: publish
   services:
     - docker:19.03.1-dind
+  image: docker:19.03.1
   dependencies:
     - dockerize
   only:
     - tags
   before_script:
-    - apt-get update && apt-get upgrade -y
-    - apt-get install -y make git g++ docker-ce
+    - apk add git jq make
     - docker login ${DOCKER_REGISTRY_URL:-docker.io} -u ${DOCKER_REGISTRY_USERNAME} -p ${DOCKER_REGISTRY_PASSWORD}
   script:
     - make load
