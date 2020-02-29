@@ -12,7 +12,6 @@ deploy:
   file: ./bin/*
   skip_cleanup: true
   on:
-    branch: master
     tags: true
 before_script:
   - sudo apt-get update
