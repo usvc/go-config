@@ -1,0 +1,21 @@
+sudo: required
+stages:
+  - build
+  - deploy
+git:
+  submodules: true
+  quiet: false
+deploy:
+  provider: releases
+  api_key: ${RELEASE_TOKEN}
+  file_glob: true
+  file: ./bin/*
+  skip_cleanup: true
+  on:
+    branch: master
+    tags: true
+script:
+  - make dep
+  - GOOS=linux GOARCH=amd64 make build_compressed_production
+  - GOOS=darwin GOARCH=amd64 make build_compressed_production
+  - GOOS=windows GOARCH=386 BIN_EXT=.exe make build_compressed_production

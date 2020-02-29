@@ -3,22 +3,23 @@
 [![pipeline status](https://gitlab.com/usvc/modules/go/config/badges/master/pipeline.svg)](https://gitlab.com/usvc/modules/go/config/-/commits/master)
 
 
-A Go package to deal with configurations easily.
+A Go package to deal with configuration.
 
 - [Config](#config)
-  - [Usage](#usage)
-    - [Importing](#importing)
-    - [Defining configuration](#defining-configuration)
-    - [Consuming from environment](#consuming-from-environment)
-    - [Applying to Cobra (`github.com/spf13/cobra` package)](#applying-to-cobra-githubcomspf13cobra-package)
-    - [Deciding environment/flag precedence](#deciding-environmentflag-precedence)
-    - [Retrieving values frrom the configuration](#retrieving-values-frrom-the-configuration)
-    - [Note on `*`Slice types](#note-on-slice-types)
-    - [Note on configuration names](#note-on-configuration-names)
-  - [Development Runbook](#development-runbook)
-    - [Getting Started](#getting-started)
-    - [Continuous Integration (CI) Pipeline](#continuous-integration-ci-pipeline)
-  - [Licensing](#licensing)
+	- [Usage](#usage)
+		- [Importing](#importing)
+		- [Defining configuration](#defining-configuration)
+		- [Consuming from environment](#consuming-from-environment)
+		- [Applying to Cobra (github.com/spf13/cobra package)](#applying-to-cobra-githubcomspf13cobra-package)
+		- [Deciding environment/flag precedence](#deciding-environmentflag-precedence)
+		- [Retrieving values frrom the configuration](#retrieving-values-frrom-the-configuration)
+		- [Note on *Slice types](#note-on-slice-types)
+		- [Note on configuration names](#note-on-configuration-names)
+	- [Example CLI Application](#example-cli-application)
+	- [Development Runbook](#development-runbook)
+		- [Getting Started](#getting-started)
+		- [Continuous Integration (CI) Pipeline](#continuous-integration-ci-pipeline)
+	- [Licensing](#licensing)
 
 ## Usage
 
@@ -167,6 +168,44 @@ The `config.Map` is used to define a dictionary of your configuration values usi
 For environment variables, all non-alphanumeric characters will be converted to an underscore (`_`), and all alphabetic characters will be converted to `UPPERCASE_IN_SNAKE_CASE`.
 
 For flags, all non-alphanumeric characters will be converted to a hypen (`-`), and all alphabetic characters will be converted to `lowercase-in-kebab-case`.
+
+## Example CLI Application
+
+The example CLI application can be found in the [`./cmd/config` directory](./cmd/config) and includes the configuration as found above. To test it out you can run the following:
+
+```sh
+# bool
+go run ./cmd/config --bool
+BOOL=1 go run ./cmd/config
+
+# float
+go run ./cmd/config --float 3.142
+FLOAT=3.142 go run ./cmd/config
+
+# int
+go run ./cmd/config --int -12345
+INT=-12345 go run ./cmd/config
+
+# []int
+go run ./cmd/config --int-slice -12345 --int-slice -67890
+INT_SLICE="-12345 -67890" go run ./cmd/config
+
+# string
+go run ./cmd/config --string "hello world"
+STRING="hello world" go run ./cmd/config
+
+# []string
+go run ./cmd/config --string-slice "hello" --string-slice "world"
+STRING_SLICE="hello world" go run ./cmd/config
+
+# uint
+go run ./cmd/config --uint 12345
+UINT=12345 go run ./cmd/config
+
+# []uint
+go run ./cmd/config --uint-slice 12345 --uint-slice 67890
+UINT_SLICE="12345 67890" go run ./cmd/config
+```
 
 ## Development Runbook
 

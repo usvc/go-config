@@ -11,7 +11,11 @@ run:
 test:
 	go test -v ./... -cover -coverprofile c.out
 build:
-	go build -o ./bin/$(CMD_ROOT) ./cmd/$(CMD_ROOT)_${GOOS}_${GOARCH}
+	CGO_ENABLED=0 \
+	go build \
+		-v \
+		-o ./bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT} \
+		./cmd/$(CMD_ROOT)
 build_production:
 	CGO_ENABLED=0 \
 	go build \
@@ -23,9 +27,9 @@ build_production:
 			-s -w" \
 		-o ./bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT} \
 		./cmd/$(CMD_ROOT)
-	rm -rf ./bin/$(CMD_ROOT)${BIN_EXT}
-	cp ./bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT} \
-		./bin/${CMD_ROOT}${BIN_EXT}
+build_compressed_production: build_production
+	upx -9 -v ./bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT}
+	upx -t ./bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT}
 
 package:
 	docker build --file ./deploy/Dockerfile --tag $(DOCKER_NAMESPACE)/$(DOCKER_IMAGE_NAME):latest .
