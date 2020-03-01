@@ -120,7 +120,7 @@ dockerize:
     paths:
       - ./build/*
   before_script:
-    - apk add git jq make
+    - apk add git curl jq make
     - |
       curl -LO "https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64" \
         && chmod +x container-structure-test-linux-amd64 \

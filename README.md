@@ -1,5 +1,6 @@
 # Config
 
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/usvc/config?sort=semver)
 [![pipeline status](https://gitlab.com/usvc/modules/go/config/badges/master/pipeline.svg)](https://gitlab.com/usvc/modules/go/config/-/commits/master)
 [![release status](https://travis-ci.org/usvc/config.svg?branch=master)](https://travis-ci.org/usvc/config)
 
