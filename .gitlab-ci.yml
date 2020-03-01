@@ -77,19 +77,14 @@ version bump:
 
 compress:
   stage: package
-  only:
-    - tags
+  only: ["tags"]
   # allow failure because it's not necessary to always compress
   # even though that would be nice
   allow_failure: true
-  dependencies:
-    - build linux
-    - build macos
-    - build windows
+  dependencies: ["build"]
   artifacts:
     expire_in: 1 day
-    paths:
-      - ./bin/*
+    paths: ["./bin/*"]
   before_script:
     - apt-get update && apt-get upgrade -y
     - apt-get install -y make g++ upx
