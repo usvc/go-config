@@ -9,7 +9,7 @@ stages:
 
 init:
   stage: init
-  image: usvc/ci:go-dependencies
+  image: usvc/ci:go-dependencies-20200301154807
   cache:
     key: ${CI_PROJECT_REF}_${CI_COMMIT_REF_NAME}
     paths:
