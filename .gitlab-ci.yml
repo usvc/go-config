@@ -24,12 +24,10 @@ init:
 unit test:
   stage: test
   image: usvc/ci:go-test
-  dependencies:
-    - init
+  dependencies: ["init"]
   artifacts:
     expire_in: 1 day
-    paths:
-      - ./c.out
+    paths: ["./c.out"]
   script:
     - entrypoint
 
@@ -38,8 +36,7 @@ unit test:
   dependencies: ["init"]
   artifacts:
     expire_in: 1 day
-    paths:
-      - ./bin/*
+    paths: ["./bin/*"]
   script:
     - git fetch
     - CMD_ROOT=config GOOS=linux GOARCH=amd64 entrypoint
@@ -56,8 +53,7 @@ build:
 
 version bump:
   stage: release
-  only:
-    - master
+  only: ["master"]
   image: usvc/semver:gitlab-latest
   before_script:
     - apk update && apk upgrade
