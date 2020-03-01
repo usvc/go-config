@@ -21,7 +21,7 @@ init:
   script:
     - entrypoint
 
-test:
+unit test:
   stage: test
   image: usvc/ci:go-test
   dependencies:
@@ -42,56 +42,16 @@ test:
       - ./bin/*
   script:
     - git fetch
-    - entrypoint
-
-build linux (test):
+    - CMD_ROOT=config GOOS=linux GOARCH=amd64 entrypoint
+    - CMD_ROOT=config GOOS=darwin GOARCH=amd64 entrypoint
+    - CMD_ROOT=config GOOS=windows GOARCH=386 BIN_EXT=.exe entrypoint
+test build:
   extends: .build
   stage: test
-  variables:
-    GOOS: linux
-    GOARCH: amd64
   only: ["master"]
-
-build linux:
+build:
   extends: .build
   stage: build
-  variables:
-    GOOS: linux
-    GOARCH: amd64
-  only: ["tags"]
-
-build macos (test):
-  extends: .build
-  stage: test
-  variables:
-    GOOS: darwin
-    GOARCH: amd64
-  only: ["master"]
-
-build macos:
-  extends: .build
-  stage: build
-  variables:
-    GOOS: darwin
-    GOARCH: amd64
-  only: ["tags"]
-
-build windows (test):
-  extends: .build
-  stage: test
-  variables:
-    BIN_EXT: .exe
-    GOOS: windows
-    GOARCH: 386
-  only: ["master"]
-
-build windows:
-  extends: .build
-  stage: build
-  variables:
-    BIN_EXT: .exe
-    GOOS: windows
-    GOARCH: "386"
   only: ["tags"]
 
 version bump:
@@ -141,36 +101,25 @@ compress:
 
 dockerize:
   stage: package
-  only:
-    - tags
-  services:
-    - docker:19.03.1-dind
-  image: docker:19.03.1
-  dependencies:
-    - build linux
+  only: ["tags"]
+  services: ["docker:19.03.1-dind"]
+  image: usvc/ci:docker-build
+  dependencies: ["build"]
   artifacts:
     expire_in: 1 day
-    paths:
-      - ./build/*
-  before_script:
-    - apk add git curl jq make
-    - |
-      curl -LO "https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64" \
-        && chmod +x container-structure-test-linux-amd64 \
-        && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+    paths: ["./build/*"]
+  variables:
+    IMAGE_URL: usvc/libeg-config:latest
+    OUTPUT_PATH: ./build/config.tar.gz
   script:
-    - make image test_image
-    - make save
+    - entrypoint
 
 dockerhub:
   stage: publish
-  only:
-    - tags
-  services:
-    - docker:19.03.1-dind
+  only: ["tags"]
+  services: ["docker:19.03.1-dind"]
   image: docker:19.03.1
-  dependencies:
-    - dockerize
+  dependencies: ["dockerize"]
   before_script:
     - apk add git jq make
     - docker login ${DOCKER_REGISTRY_URL:-docker.io} -u ${DOCKER_REGISTRY_USERNAME} -p ${DOCKER_REGISTRY_PASSWORD}
