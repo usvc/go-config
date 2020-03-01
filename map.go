@@ -15,7 +15,7 @@ func (m *Map) ApplyToCobra(command *cobra.Command) {
 	}
 }
 
-func (m *Map) GetFromEnvironment() {
+func (m *Map) LoadFromEnvironment() {
 	env := viper.New()
 	for rawEnvKey, conf := range *m {
 		envKey := normalizeName(rawEnvKey, separatorEnv)
@@ -60,6 +60,10 @@ func (m *Map) GetFromEnvironment() {
 			}
 		}
 	}
+}
+
+func (m Map) Get(id string) interface{} {
+	return m[id].GetValue()
 }
 
 func (m Map) GetBool(id string) bool {

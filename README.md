@@ -105,7 +105,7 @@ var conf = config.Map{
 > Following example assumes the above `conf` variable was defined.
 
 ```go
-conf.GetFromEnvironment()
+conf.LoadFromEnvironment()
 ```
 
 ### Applying to Cobra (`github.com/spf13/cobra` package)
@@ -121,25 +121,25 @@ conf.ApplyToCobra(cmd)
 
 > Following example assumes the above `conf` variable was defined.
 
-To give priority to environment variables first, call `GetFromEnvironment()` outside of the `cobra.Command`'s runtime functions (eg. `PreRun`/`Run`)
+To give priority to environment variables first, call `LoadFromEnvironment()` outside of the `cobra.Command`'s runtime functions (eg. `PreRun`/`Run`)
 
 ```go
 func main() {
   cmd := cobra.Command{ /* ... config ... */ }
   conf.ApplyToCobra(cmd)
-  conf.GetFromEnvironment()
+  conf.LoadFromEnvironment()
   cmd.Execute()
 }
 ```
 
-To give priority to values from flags first, call `GetFromEnvironment()` inside one of `cobra.Command`'s runtime functions:
+To give priority to values from flags first, call `LoadFromEnvironment()` inside one of `cobra.Command`'s runtime functions:
 
 ```go
 func main() {
   cmd := cobra.Command{
     // ... other config ...
     PreRun: func(c *cobra.Command, args []string) {
-      conf.GetFromEnvironment()
+      conf.LoadFromEnvironment()
     },
     // ... other config ...
   }

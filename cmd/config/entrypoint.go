@@ -17,7 +17,7 @@ func main() {
 		Use:     "config",
 		Version: fmt.Sprintf("%s-%s %s", Version, Commit, Timestamp),
 		PreRun: func(command *cobra.Command, args []string) {
-			conf.GetFromEnvironment()
+			conf.LoadFromEnvironment()
 		},
 		Run: func(command *cobra.Command, args []string) {
 			for key, conf := range conf {
