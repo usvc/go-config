@@ -9,7 +9,7 @@ stages:
 
 init:
   stage: init
-  image: usvc/ci:go-dependencies-20200301154807
+  image: usvc/ci:go-dependencies
   cache:
     key: ${CI_PROJECT_REF}_${CI_COMMIT_REF_NAME}
     paths:
@@ -23,43 +23,76 @@ init:
 
 test:
   stage: test
+  image: usvc/ci:go-test
   dependencies:
     - init
   artifacts:
     expire_in: 1 day
     paths:
       - ./c.out
-  before_script:
-    - apt-get update && apt-get upgrade -y
-    - apt-get install -y make g++
   script:
-    - make test
+    - entrypoint
 
 .build:
-  before_script:
-    - apt-get update && apt-get upgrade -y
-    - apt-get install -y g++ git make
-  script:
-    - git fetch
-    - GOOS=linux GOARCH=amd64 make build_production
-    - GOOS=darwin GOARCH=amd64 make build_production
-    - GOOS=windows GOARCH=386 BIN_EXT=.exe make build_production
-
-test build:
-  extends: .build
-  stage: test
-  only:
-    - master
-
-build:
-  extends: .build
-  stage: build
-  only:
-    - tags
+  image: usvc/ci:go-build-production
+  dependencies: ["init"]
   artifacts:
     expire_in: 1 day
     paths:
       - ./bin/*
+  script:
+    - git fetch
+    - entrypoint
+
+build linux (test):
+  extends: .build
+  stage: test
+  variables:
+    GOOS: linux
+    GOARCH: amd64
+  only: ["master"]
+
+build linux:
+  extends: .build
+  stage: build
+  variables:
+    GOOS: linux
+    GOARCH: amd64
+  only: ["tags"]
+
+build macos (test):
+  extends: .build
+  stage: test
+  variables:
+    GOOS: darwin
+    GOARCH: amd64
+  only: ["master"]
+
+build macos:
+  extends: .build
+  stage: build
+  variables:
+    GOOS: darwin
+    GOARCH: amd64
+  only: ["tags"]
+
+build windows (test):
+  extends: .build
+  stage: test
+  variables:
+    BIN_EXT: .exe
+    GOOS: windows
+    GOARCH: 386
+  only: ["master"]
+
+build windows:
+  extends: .build
+  stage: build
+  variables:
+    BIN_EXT: .exe
+    GOOS: windows
+    GOARCH: "386"
+  only: ["tags"]
 
 version bump:
   stage: release
