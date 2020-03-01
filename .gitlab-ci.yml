@@ -9,6 +9,7 @@ stages:
 
 init:
   stage: init
+  image: usvc/ci:go-dependencies
   cache:
     key: ${CI_PROJECT_REF}_${CI_COMMIT_REF_NAME}
     paths:
@@ -17,11 +18,8 @@ init:
     expire_in: 1 day
     paths:
       - ./vendor
-  before_script:
-    - apt-get update && apt-get upgrade -y
-    - apt-get install -y g++ git make
   script:
-    - make deps
+    - entrypoint
 
 test:
   stage: test
