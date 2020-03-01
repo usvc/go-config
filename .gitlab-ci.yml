@@ -123,7 +123,9 @@ compress:
   # even though that would be nice
   allow_failure: true
   dependencies:
-    - build
+    - build linux
+    - build macos
+    - build windows
   artifacts:
     expire_in: 1 day
     paths:
@@ -145,7 +147,7 @@ dockerize:
     - docker:19.03.1-dind
   image: docker:19.03.1
   dependencies:
-    - build
+    - build linux
   artifacts:
     expire_in: 1 day
     paths:
