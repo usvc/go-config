@@ -14,7 +14,6 @@ init:
     key: ${CI_PROJECT_REF}_${CI_COMMIT_REF_NAME}
     paths: ["./vendor"]
   artifacts:
-    expire_in: 1 day
     paths: ["./vendor"]
   script: ["entrypoint"]
 
@@ -23,7 +22,6 @@ unit test:
   image: usvc/ci:go-test
   dependencies: ["init"]
   artifacts:
-    expire_in: 1 day
     paths: ["./c.out"]
   script:
     - entrypoint
@@ -32,7 +30,6 @@ unit test:
   image: usvc/ci:go-build-production
   dependencies: ["init"]
   artifacts:
-    expire_in: 1 day
     paths: ["./bin/*"]
   script:
     - git fetch
@@ -76,7 +73,6 @@ compress:
   allow_failure: true
   dependencies: ["build"]
   artifacts:
-    expire_in: 1 day
     paths: ["./bin/*"]
   before_script:
     - apt-get update && apt-get upgrade -y
