@@ -16,8 +16,7 @@ init:
   artifacts:
     expire_in: 1 day
     paths: ["./vendor"]
-  script:
-    - entrypoint
+  script: ["entrypoint"]
 
 unit test:
   stage: test
