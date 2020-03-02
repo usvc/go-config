@@ -12,12 +12,10 @@ init:
   image: usvc/ci:go-dependencies
   cache:
     key: ${CI_PROJECT_REF}_${CI_COMMIT_REF_NAME}
-    paths:
-      - ./vendor
+    paths: ["./vendor"]
   artifacts:
     expire_in: 1 day
-    paths:
-      - ./vendor
+    paths: ["./vendor"]
   script:
     - entrypoint
 
@@ -103,6 +101,7 @@ dockerize:
     IMAGE_URL: usvc/libeg-config:latest
     OUTPUT_PATH: ./build/config.tar.gz
   script:
+    - mkdir -p ./build
     - entrypoint
 
 dockerhub:
