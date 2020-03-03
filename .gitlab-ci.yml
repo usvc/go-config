@@ -1,8 +1,7 @@
 image: golang:1.14
 stages:
   - init
-  - test
-  - build
+  - test & build
   - release
   - package
   - publish
@@ -18,31 +17,55 @@ init:
   script: ["entrypoint"]
 
 unit test:
-  stage: test
+  stage: test & build
   image: usvc/ci:go-test
   dependencies: ["init"]
   artifacts:
     paths: ["./c.out"]
-  script:
-    - entrypoint
+  script: ["entrypoint"]
 
 .build:
   image: usvc/ci:go-build-production
+  stage: test & build
   dependencies: ["init"]
   artifacts:
     paths: ["./bin/*"]
-  script:
-    - git fetch
-    - CMD_ROOT=config GOOS=linux GOARCH=amd64 entrypoint
-    - CMD_ROOT=config GOOS=darwin GOARCH=amd64 entrypoint
-    - CMD_ROOT=config GOOS=windows GOARCH=386 BIN_EXT=.exe entrypoint
-test build:
+  variables:
+    BIN_NAME: config
+  before_script: ["git fetch"]
+  script: ["entrypoint"]
+.build_linux:
   extends: .build
-  stage: test
+  variables:
+    GOOS: linux
+    GOARCH: amd64
+build linux (test):
+  extends: .build_linux
   only: ["master"]
-build:
+build linux:
+  extends: .build_linux
+  only: ["tags"]
+.build_macos:
   extends: .build
-  stage: build
+  variables:
+    GOOS: darwin
+    GOARCH: amd64
+build macos (test):
+  extends: .build_macos
+  only: ["master"]
+build macos:
+  extends: .build_macos
+  only: ["tags"]
+.build_windows:
+  extends: .build
+  variables:
+    GOOS: windows
+    GOARCH: "386"
+build windows (test):
+  extends: .build_windows
+  only: ["master"]
+build windows:
+  extends: .build_windows
   only: ["tags"]
 
 version bump:
@@ -90,27 +113,16 @@ dockerize:
   image: usvc/ci:docker-build
   dependencies: ["build"]
   artifacts:
-    expire_in: 1 day
     paths: ["./build/*"]
   variables:
-    IMAGE_URL: usvc/libeg-config:latest
-    OUTPUT_PATH: ./build/config.tar.gz
-  script:
-    - mkdir -p ./build
-    - entrypoint
+    DOCKER_IMAGE_URL: usvc/libeg-config
+    DOCKER_IMAGE_TAG: latest
+  script: ["entrypoint"]
 
 dockerhub:
   stage: publish
   only: ["tags"]
   services: ["docker:19.03.1-dind"]
-  image: docker:19.03.1
+  image: usvc/ci:docker-publish
   dependencies: ["dockerize"]
-  before_script:
-    - apk add git jq make
-    - docker login ${DOCKER_REGISTRY_URL:-docker.io} -u ${DOCKER_REGISTRY_USERNAME} -p ${DOCKER_REGISTRY_PASSWORD}
-  script:
-    - make load
-    - make dockerhub
-  after_script:
-    - docker logout
-    - rm -rf ~/.docker/config.json
+  script: ["entrypoint"]
