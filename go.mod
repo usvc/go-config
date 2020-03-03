@@ -1,4 +1,4 @@
-module github.com/usvc/config
+module github.com/usvc/go-config
 
 go 1.13
 

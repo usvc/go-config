@@ -1,6 +1,6 @@
 # Config
 
-[![release github](https://img.shields.io/github/v/release/usvc/config?sort=semver)](https://github.com/usvc/config)
+[![release github](https://img.shields.io/github/v/release/usvc/config?sort=semver)](https://github.com/usvc/go-config)
 
 
 [![pipeline status](https://gitlab.com/usvc/modules/go/config/badges/master/pipeline.svg)](https://gitlab.com/usvc/modules/go/config/-/commits/master)
@@ -34,7 +34,7 @@ A Go package to deal with configuration.
 ### Importing
 
 ```go
-import "github.com/usvc/config"
+import "github.com/usvc/go-config"
 ```
 
 ### Defining configuration

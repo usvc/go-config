@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/usvc/config"
+	"github.com/usvc/go-config"
 )
 
 var conf = config.Map{
