@@ -94,7 +94,7 @@ compress:
   # allow failure because it's not necessary to always compress
   # even though that would be nice
   allow_failure: true
-  dependencies: ["build"]
+  dependencies: ["build linux", "build macos", "build windows"]
   artifacts:
     paths: ["./bin/*"]
   before_script:
@@ -111,7 +111,6 @@ dockerize:
   only: ["tags"]
   services: ["docker:19.03.1-dind"]
   image: usvc/ci:docker-build
-  dependencies: ["build"]
   artifacts:
     paths: ["./build/*"]
   variables:
