@@ -1,10 +1,10 @@
 # Config
 
-[![release github](https://img.shields.io/github/v/release/usvc/config?sort=semver)](https://github.com/usvc/go-config)
+[![release github](https://img.shields.io/github/v/release/usvc/go-config?sort=semver)](https://github.com/usvc/go-config)
 
 
 [![pipeline status](https://gitlab.com/usvc/modules/go/config/badges/master/pipeline.svg)](https://gitlab.com/usvc/modules/go/config/-/commits/master)
-[![release status](https://travis-ci.org/usvc/config.svg?branch=master)](https://travis-ci.org/usvc/config)
+[![release status](https://travis-ci.org/usvc/go-config.svg?branch=master)](https://travis-ci.org/usvc/go-config)
 
 A Go package to deal with configuration.
 
