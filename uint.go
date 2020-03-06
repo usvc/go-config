@@ -45,6 +45,9 @@ func (s *Uint) GetValuePointer() interface{} {
 }
 
 func (s *Uint) GetValue() interface{} {
+	if isZeroValue(s.Value) {
+		return s.Default
+	}
 	return s.Value
 }
 

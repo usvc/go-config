@@ -13,7 +13,43 @@ const (
 	separatorFlag rune = '-'
 )
 
+func areEqualFloatSlice(sliceA, sliceB []float64) bool {
+	if len(sliceA) != len(sliceB) {
+		return false
+	}
+	for index, value := range sliceA {
+		if value != sliceB[index] {
+			return false
+		}
+	}
+	return true
+}
+
+func areEqualIntSlice(sliceA, sliceB []int) bool {
+	if len(sliceA) != len(sliceB) {
+		return false
+	}
+	for index, value := range sliceA {
+		if value != sliceB[index] {
+			return false
+		}
+	}
+	return true
+}
+
 func areEqualStringSlice(sliceA, sliceB []string) bool {
+	if len(sliceA) != len(sliceB) {
+		return false
+	}
+	for index, value := range sliceA {
+		if value != sliceB[index] {
+			return false
+		}
+	}
+	return true
+}
+
+func areEqualUintSlice(sliceA, sliceB []uint) bool {
 	if len(sliceA) != len(sliceB) {
 		return false
 	}
@@ -31,12 +67,20 @@ func isZeroValue(value interface{}) bool {
 		return v == *new(bool)
 	case int:
 		return v == *new(int)
+	case []int:
+		return areEqualIntSlice(v, []int{})
 	case string:
 		return v == *new(string)
+	case []string:
+		return areEqualStringSlice(v, []string{})
 	case uint:
 		return v == *new(uint)
+	case []uint:
+		return areEqualUintSlice(v, []uint{})
 	case float64:
 		return v == *new(float64)
+	case []float64:
+		return areEqualFloatSlice(v, []float64{})
 	default:
 		return v == nil
 	}

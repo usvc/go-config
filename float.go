@@ -45,6 +45,9 @@ func (s *Float) GetValuePointer() interface{} {
 }
 
 func (s *Float) GetValue() interface{} {
+	if isZeroValue(s.Value) {
+		return s.Default
+	}
 	return s.Value
 }
 

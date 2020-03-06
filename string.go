@@ -47,6 +47,9 @@ func (s *String) GetValuePointer() interface{} {
 }
 
 func (s *String) GetValue() interface{} {
+	if isZeroValue(s.Value) {
+		return s.Default
+	}
 	return s.Value
 }
 

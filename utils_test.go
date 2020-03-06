@@ -14,6 +14,66 @@ func TestUtils(t *testing.T) {
 	suite.Run(t, new(UtilsTests))
 }
 
+func (s *UtilsTests) Test_areEqualFloatSlice_equal() {
+	var equals = [][][]float64{
+		[][]float64{[]float64{1.1, 2.2}, []float64{1.1, 2.2}},
+		[][]float64{[]float64{-1.1, -2.2}, []float64{-1.1, -2.2}},
+	}
+	for _, cases := range equals {
+		s.True(areEqualFloatSlice(cases[0], cases[1]))
+	}
+}
+
+func (s *UtilsTests) Test_areEqualFloatSlice_unequalLength() {
+	var unequals = [][][]float64{
+		[][]float64{[]float64{1.1}, []float64{1.1, 2.2}},
+		[][]float64{[]float64{-1.1}, []float64{-1.1, 2.2}},
+	}
+	for _, cases := range unequals {
+		s.False(areEqualFloatSlice(cases[0], cases[1]))
+	}
+}
+
+func (s *UtilsTests) Test_areEqualFloatSlice_unequalValue() {
+	var unequals = [][][]float64{
+		[][]float64{[]float64{1.1, 2.2}, []float64{1.1, -2.2}},
+		[][]float64{[]float64{-1.1, -2.2}, []float64{-1.1, 2.2}},
+	}
+	for _, cases := range unequals {
+		s.False(areEqualFloatSlice(cases[0], cases[1]))
+	}
+}
+
+func (s *UtilsTests) Test_areEqualIntSlice_equal() {
+	var equals = [][][]int{
+		[][]int{[]int{1, 2}, []int{1, 2}},
+		[][]int{[]int{-1, -2}, []int{-1, -2}},
+	}
+	for _, cases := range equals {
+		s.True(areEqualIntSlice(cases[0], cases[1]))
+	}
+}
+
+func (s *UtilsTests) Test_areEqualIntSlice_unequalLength() {
+	var unequals = [][][]int{
+		[][]int{[]int{1}, []int{1, 2}},
+		[][]int{[]int{-1}, []int{-1, 2}},
+	}
+	for _, cases := range unequals {
+		s.False(areEqualIntSlice(cases[0], cases[1]))
+	}
+}
+
+func (s *UtilsTests) Test_areEqualIntSlice_unequalValue() {
+	var unequals = [][][]int{
+		[][]int{[]int{1, 2}, []int{1, -2}},
+		[][]int{[]int{-1, -2}, []int{-1, 2}},
+	}
+	for _, cases := range unequals {
+		s.False(areEqualIntSlice(cases[0], cases[1]))
+	}
+}
+
 func (s *UtilsTests) Test_areEqualStringSlice_equal() {
 	var equalStringSlices = [][][]string{
 		[][]string{[]string{"a", "b"}, []string{"a", "b"}},
@@ -41,6 +101,39 @@ func (s *UtilsTests) Test_areEqualStringSlice_unequalValue() {
 	}
 	for _, cases := range unequalStringSlices {
 		s.False(areEqualStringSlice(cases[0], cases[1]))
+	}
+}
+
+func (s *UtilsTests) Test_areEqualUintSlice_equal() {
+	var equals = [][][]uint{
+		[][]uint{[]uint{1, 2}, []uint{1, 2}},
+		[][]uint{[]uint{2, 3}, []uint{2, 3}},
+	}
+	for _, cases := range equals {
+		s.True(areEqualUintSlice(cases[0], cases[1]))
+	}
+}
+
+func (s *UtilsTests) Test_areEqualUintSlice_unequalLength() {
+	var unequals = [][][]uint{
+		[][]uint{[]uint{1}, []uint{1, 2}},
+		[][]uint{[]uint{1, 2}, []uint{1, 2, 3}},
+		[][]uint{[]uint{2}, []uint{1, 2, 3}},
+		[][]uint{[]uint{3}, []uint{1, 2, 3}},
+		[][]uint{[]uint{2, 3}, []uint{1, 2, 3}},
+	}
+	for _, cases := range unequals {
+		s.False(areEqualUintSlice(cases[0], cases[1]))
+	}
+}
+
+func (s *UtilsTests) Test_areEqualUintSlice_unequalValue() {
+	var unequals = [][][]uint{
+		[][]uint{[]uint{1, 2}, []uint{2, 1}},
+		[][]uint{[]uint{2, 1}, []uint{1, 2}},
+	}
+	for _, cases := range unequals {
+		s.False(areEqualUintSlice(cases[0], cases[1]))
 	}
 }
 
