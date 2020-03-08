@@ -6,26 +6,33 @@
 
 A Go package to deal with configuration.
 
+| | |
+| --- | --- |
+| Github | [https://github.com/usvc/go-config](https://github.com/usvc/go-config) |
+| Gitlab | [https://gitlab.com/usvc/modules/go/config](https://gitlab.com/usvc/modules/go/config) |
+
+- - -
+
 - [Config](#config)
-  - [Usage](#usage)
-    - [Importing](#importing)
-    - [Defining configuration](#defining-configuration)
-    - [Consuming from environment](#consuming-from-environment)
-    - [Applying to Cobra (`github.com/spf13/cobra` package)](#applying-to-cobra-githubcomspf13cobra-package)
-    - [Deciding environment/flag precedence](#deciding-environmentflag-precedence)
-    - [Retrieving values frrom the configuration](#retrieving-values-frrom-the-configuration)
-    - [Note on `*`Slice types](#note-on-slice-types)
-    - [Note on configuration names](#note-on-configuration-names)
-  - [Example CLI Application](#example-cli-application)
-  - [Development Runbook](#development-runbook)
-    - [Getting Started](#getting-started)
-    - [Continuous Integration (CI) Pipeline](#continuous-integration-ci-pipeline)
-      - [On Github](#on-github)
-        - [Releasing](#releasing)
-      - [On Gitlab](#on-gitlab)
-        - [Version Bumping](#version-bumping)
-        - [DockerHub Publishing](#dockerhub-publishing)
-  - [Licensing](#licensing)
+	- [Usage](#usage)
+		- [Importing](#importing)
+		- [Defining configuration](#defining-configuration)
+		- [Consuming from environment](#consuming-from-environment)
+		- [Applying to Cobra (github.com/spf13/cobra package)](#applying-to-cobra-githubcomspf13cobra-package)
+		- [Deciding environment/flag precedence](#deciding-environmentflag-precedence)
+		- [Retrieving values frrom the configuration](#retrieving-values-frrom-the-configuration)
+		- [Note on *Slice types](#note-on-slice-types)
+		- [Note on configuration names](#note-on-configuration-names)
+	- [Example CLI Application](#example-cli-application)
+	- [Development Runbook](#development-runbook)
+		- [Getting Started](#getting-started)
+		- [Continuous Integration (CI) Pipeline](#continuous-integration-ci-pipeline)
+			- [On Github](#on-github)
+				- [Releasing](#releasing)
+			- [On Gitlab](#on-gitlab)
+				- [Version Bumping](#version-bumping)
+				- [DockerHub Publishing](#dockerhub-publishing)
+	- [Licensing](#licensing)
 
 ## Usage
 
