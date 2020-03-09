@@ -2,13 +2,21 @@ package config
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
 type Map map[string]Config
 
 func (m *Map) ApplyToCobra(command *cobra.Command) {
-	flags := command.Flags()
+	m.ApplyToFlagSet(command.Flags())
+}
+
+func (m *Map) ApplyToCobraPersistent(command *cobra.Command) {
+	m.ApplyToFlagSet(command.PersistentFlags())
+}
+
+func (m *Map) ApplyToFlagSet(flags *pflag.FlagSet) {
 	for rawFlagString, conf := range *m {
 		flagString := normalizeName(rawFlagString, separatorFlag)
 		conf.ApplyToFlagSet(flagString, flags)

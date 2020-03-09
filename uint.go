@@ -2,6 +2,8 @@ package config
 
 import "github.com/spf13/pflag"
 
+// Uint represents a configuration which should be interpreted
+// as an unsigned integer
 type Uint struct {
 	Shorthand string
 	Usage     string
@@ -9,6 +11,7 @@ type Uint struct {
 	Value     uint
 }
 
+// ApplyToFlagSet applies the configuration to a provided flag set
 func (s *Uint) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	var (
 		ok        bool
@@ -28,22 +31,27 @@ func (s *Uint) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	}
 }
 
+// GetDefault retrieves the default value of this configuration
 func (s *Uint) GetDefault() interface{} {
 	return s.Default
 }
 
+// GetShorthand retrieves the short form of the flag if available
 func (s *Uint) GetShorthand() string {
 	return s.Shorthand
 }
 
+// GetUsage retrieves the usage string for this configuration
 func (s *Uint) GetUsage() string {
 	return s.Usage
 }
 
+// GetValuePointer returns a pointer that points to the instance of the configured value
 func (s *Uint) GetValuePointer() interface{} {
 	return &s.Value
 }
 
+// GetValue returns the value of this configuration
 func (s *Uint) GetValue() interface{} {
 	if isZeroValue(s.Value) {
 		return s.Default
@@ -51,6 +59,7 @@ func (s *Uint) GetValue() interface{} {
 	return s.Value
 }
 
+// SetValue sets the value of this configuration
 func (s *Uint) SetValue(value interface{}) {
 	s.Value = value.(uint)
 }

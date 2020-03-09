@@ -2,6 +2,8 @@ package config
 
 import "github.com/spf13/pflag"
 
+// Float stores the configuration details for a floating
+// point value
 type Float struct {
 	Shorthand string
 	Usage     string
@@ -9,6 +11,7 @@ type Float struct {
 	Value     float64
 }
 
+// ApplyToFlagSet applies the configuration to a provided flag set
 func (s *Float) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	var (
 		ok        bool
@@ -28,22 +31,27 @@ func (s *Float) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	}
 }
 
+// GetDefault retrieves the default value of this configuration
 func (s *Float) GetDefault() interface{} {
 	return s.Default
 }
 
+// GetShorthand retrieves the short form of the flag if available
 func (s *Float) GetShorthand() string {
 	return s.Shorthand
 }
 
+// GetUsage retrieves the usage string for this configuration
 func (s *Float) GetUsage() string {
 	return s.Usage
 }
 
+// GetValuePointer returns a pointer that points to the instance of the configured value
 func (s *Float) GetValuePointer() interface{} {
 	return &s.Value
 }
 
+// GetValue returns the value of this configuration
 func (s *Float) GetValue() interface{} {
 	if isZeroValue(s.Value) {
 		return s.Default
@@ -51,6 +59,7 @@ func (s *Float) GetValue() interface{} {
 	return s.Value
 }
 
+// SetValue sets the value of this configuration
 func (s *Float) SetValue(value interface{}) {
 	s.Value = value.(float64)
 }

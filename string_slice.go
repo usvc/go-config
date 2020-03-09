@@ -4,6 +4,8 @@ import (
 	"github.com/spf13/pflag"
 )
 
+// StringSlice represents a configuration which should be represented
+// as a slice of strings
 type StringSlice struct {
 	Shorthand string
 	Usage     string
@@ -11,6 +13,7 @@ type StringSlice struct {
 	Value     []string
 }
 
+// // ApplyToFlagSet applies the configuration to a provided flag set
 func (s *StringSlice) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	var (
 		ok        bool
@@ -30,22 +33,27 @@ func (s *StringSlice) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	}
 }
 
+// GetDefault retrieves the default value of this configuration
 func (s *StringSlice) GetDefault() interface{} {
 	return s.Default
 }
 
+// GetShorthand retrieves the short form of the flag if available
 func (s *StringSlice) GetShorthand() string {
 	return s.Shorthand
 }
 
+// GetUsage retrieves the usage string for this configuration
 func (s *StringSlice) GetUsage() string {
 	return s.Usage
 }
 
+// GetValuePointer returns a pointer that points to the instance of the configured value
 func (s *StringSlice) GetValuePointer() interface{} {
 	return &s.Value
 }
 
+// GetValue returns the value of this configuration
 func (s *StringSlice) GetValue() interface{} {
 	if isZeroValue(s.Value) {
 		return s.Default
@@ -53,6 +61,7 @@ func (s *StringSlice) GetValue() interface{} {
 	return s.Value
 }
 
+// SetValue sets the value of this configuration
 func (s *StringSlice) SetValue(value interface{}) {
 	s.Value = value.([]string)
 }
