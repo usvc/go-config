@@ -1,9 +1,14 @@
-PROJECT_NAME=config
 CMD_ROOT=config
 DOCKER_NAMESPACE=usvc
 DOCKER_IMAGE_NAME=libeg-config
+PROJECT_NAME=config
+GIT_COMMIT=$$(git rev-parse --verify HEAD)
+GIT_TAG=$$(git describe --tag $$(git rev-list --tags --max-count=1))
+TIMESTAMP=$(shell date +'%Y%m%d%H%M%S')
 
 -include ./makefile.properties
+
+BIN_PATH=$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT}
 
 deps:
 	go mod vendor -v
@@ -13,25 +18,32 @@ run:
 test:
 	go test -v ./... -cover -coverprofile c.out
 build:
-	CGO_ENABLED=0 \
 	go build \
-		-v \
-		-o ./bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT} \
+		-o ./bin/$(BIN_PATH) \
 		./cmd/$(CMD_ROOT)
 build_production:
 	CGO_ENABLED=0 \
-	go build \
-		-a -v \
-		-ldflags "-X main.Commit=$$(git rev-parse --verify HEAD) \
-			-X main.Version=$$(git describe --tag $$(git rev-list --tags --max-count=1)) \
-			-X main.Timestamp=$$(date +'%Y%m%d%H%M%S') \
+	go build -a -v \
+		-ldflags "-X main.Commit=$(GIT_COMMIT) \
+			-X main.Version=$(GIT_TAG) \
+			-X main.Timestamp=$(TIMESTAMP) \
 			-extldflags 'static' \
 			-s -w" \
-		-o ./bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT} \
+		-o ./bin/$(BIN_PATH) \
 		./cmd/$(CMD_ROOT)
-compress_production:
-	upx -9 -v ./bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT}
-	upx -t ./bin/$(CMD_ROOT)_$$(go env GOOS)_$$(go env GOARCH)${BIN_EXT}
+	sha256sum -b ./bin/$(BIN_PATH) \
+		| cut -f 1 -d ' ' > ./bin/$(BIN_PATH).sha256
+compress:
+	ls -lah ./bin/$(BIN_PATH)
+	upx -9 -v -o ./bin/.$(BIN_PATH) \
+		./bin/$(BIN_PATH)
+	upx -t ./bin/.$(BIN_PATH)
+	rm -rf ./bin/$(BIN_PATH)
+	mv ./bin/.$(BIN_PATH) \
+		./bin/$(BIN_PATH)
+	sha256sum -b ./bin/$(BIN_PATH) \
+		| cut -f 1 -d ' ' > ./bin/$(BIN_PATH).sha256
+	ls -lah ./bin/$(BIN_PATH)
 
 image:
 	docker build \
