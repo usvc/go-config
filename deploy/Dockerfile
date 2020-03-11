@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . .
 RUN make deps
 RUN make build_production
-RUN make compress_production
+RUN make compress
 
 FROM gcr.io/distroless/base-debian10
 COPY --from=builder /app/bin/config_linux_amd64 /config
