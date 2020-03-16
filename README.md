@@ -1,8 +1,10 @@
 # Config
 
 [![release github](https://badge.fury.io/gh/usvc%2Fgo-config.svg)](https://github.com/usvc/go-config/releases)
-[![pipeline status](https://gitlab.com/usvc/modules/go/config/badges/master/pipeline.svg)](https://gitlab.com/usvc/modules/go/config/-/commits/master)
 [![build status](https://travis-ci.org/usvc/go-config.svg?branch=master)](https://travis-ci.org/usvc/go-config)
+[![pipeline status](https://gitlab.com/usvc/modules/go/config/badges/master/pipeline.svg)](https://gitlab.com/usvc/modules/go/config/-/commits/master)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/aa75f20cdfd8f0d5785b/test_coverage)](https://codeclimate.com/github/usvc/go-config/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/aa75f20cdfd8f0d5785b/maintainability)](https://codeclimate.com/github/usvc/go-config/maintainability)
 
 A Go package to deal with configuration.
 
@@ -14,25 +16,25 @@ A Go package to deal with configuration.
 - - -
 
 - [Config](#config)
-	- [Usage](#usage)
-		- [Importing](#importing)
-		- [Defining configuration](#defining-configuration)
-		- [Consuming from environment](#consuming-from-environment)
-		- [Applying to Cobra (github.com/spf13/cobra package)](#applying-to-cobra-githubcomspf13cobra-package)
-		- [Deciding environment/flag precedence](#deciding-environmentflag-precedence)
-		- [Retrieving values frrom the configuration](#retrieving-values-frrom-the-configuration)
-		- [Note on *Slice types](#note-on-slice-types)
-		- [Note on configuration names](#note-on-configuration-names)
-	- [Example CLI Application](#example-cli-application)
-	- [Development Runbook](#development-runbook)
-		- [Getting Started](#getting-started)
-		- [Continuous Integration (CI) Pipeline](#continuous-integration-ci-pipeline)
-			- [On Github](#on-github)
-				- [Releasing](#releasing)
-			- [On Gitlab](#on-gitlab)
-				- [Version Bumping](#version-bumping)
-				- [DockerHub Publishing](#dockerhub-publishing)
-	- [Licensing](#licensing)
+  - [Usage](#usage)
+    - [Importing](#importing)
+    - [Defining configuration](#defining-configuration)
+    - [Consuming from environment](#consuming-from-environment)
+    - [Applying to Cobra (`github.com/spf13/cobra` package)](#applying-to-cobra-githubcomspf13cobra-package)
+    - [Deciding environment/flag precedence](#deciding-environmentflag-precedence)
+    - [Retrieving values frrom the configuration](#retrieving-values-frrom-the-configuration)
+    - [Note on `*`Slice types](#note-on-slice-types)
+    - [Note on configuration names](#note-on-configuration-names)
+  - [Example CLI Application](#example-cli-application)
+  - [Development Runbook](#development-runbook)
+    - [Getting Started](#getting-started)
+    - [Continuous Integration (CI) Pipeline](#continuous-integration-ci-pipeline)
+      - [On Github](#on-github)
+        - [Releasing](#releasing)
+      - [On Gitlab](#on-gitlab)
+        - [Version Bumping](#version-bumping)
+        - [DockerHub Publishing](#dockerhub-publishing)
+  - [Licensing](#licensing)
 
 ## Usage
 
