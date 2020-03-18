@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -59,6 +60,16 @@ func areEqualUintSlice(sliceA, sliceB []uint) bool {
 		}
 	}
 	return true
+}
+
+func assertIDExists(configMap Map, id string) {
+	if configMap[id] == nil {
+		var environmentKeys []string
+		for key := range configMap {
+			environmentKeys = append(environmentKeys, fmt.Sprintf("'%s'", key))
+		}
+		panic(fmt.Errorf("provided id '%s' could not be found (available keys: %v)", id, environmentKeys))
+	}
 }
 
 func isZeroValue(value interface{}) bool {

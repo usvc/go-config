@@ -71,37 +71,38 @@ func (m *Map) LoadFromEnvironment() {
 }
 
 func (m Map) Get(id string) interface{} {
+	assertIDExists(m, id)
 	return m[id].GetValue()
 }
 
 func (m Map) GetBool(id string) bool {
-	return m[id].GetValue().(bool)
+	return m.Get(id).(bool)
 }
 
 func (m Map) GetFloat(id string) float64 {
-	return m[id].GetValue().(float64)
+	return m.Get(id).(float64)
 }
 
 func (m Map) GetInt(id string) int {
-	return m[id].GetValue().(int)
+	return m.Get(id).(int)
 }
 
 func (m Map) GetIntSlice(id string) []int {
-	return m[id].GetValue().([]int)
+	return m.Get(id).([]int)
 }
 
 func (m Map) GetString(id string) string {
-	return m[id].GetValue().(string)
+	return m.Get(id).(string)
 }
 
 func (m Map) GetStringSlice(id string) []string {
-	return m[id].GetValue().([]string)
+	return m.Get(id).([]string)
 }
 
 func (m Map) GetUint(id string) uint {
-	return m[id].GetValue().(uint)
+	return m.Get(id).(uint)
 }
 
 func (m Map) GetUintSlice(id string) []uint {
-	return m[id].GetValue().([]uint)
+	return m.Get(id).([]uint)
 }

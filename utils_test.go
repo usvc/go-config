@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -135,6 +136,19 @@ func (s *UtilsTests) Test_areEqualUintSlice_unequalValue() {
 	for _, cases := range unequals {
 		s.False(areEqualUintSlice(cases[0], cases[1]))
 	}
+}
+
+func (s *UtilsTests) Test_assertIDExists() {
+	expectedKey := "__not_found"
+	defer func() {
+		if r := recover(); r != nil {
+			s.Contains(fmt.Sprintf("%s", r), fmt.Sprintf("'%s' could not be found", expectedKey))
+		} else {
+			s.False(true)
+		}
+	}()
+	conf := Map{}
+	conf.GetString(expectedKey)
 }
 
 func (s *UtilsTests) Test_isZeroValue() {
