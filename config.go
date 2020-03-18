@@ -4,6 +4,8 @@ import (
 	"github.com/spf13/pflag"
 )
 
+// Config defines an interface that all configuration keys
+// should implement
 type Config interface {
 	ApplyToFlagSet(name string, flagset *pflag.FlagSet)
 	GetDefault() interface{}
