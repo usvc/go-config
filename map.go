@@ -1,6 +1,9 @@
 package config
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -53,7 +56,13 @@ func (m *Map) LoadFromEnvironment() {
 				conf.SetValue(envValue)
 			}
 		case *StringSlice:
+			// this is a hack to work around a viper/pflags integration
+			// issue, see the following isues for details:
+			// - https://github.com/spf13/viper/issues/200
+			// -  https://github.com/spf13/viper/issues/380
+			env.Set(envKey, strings.ReplaceAll(env.GetString(envKey), ",", " "))
 			envValue := env.GetStringSlice(envKey)
+			fmt.Println(envValue)
 			if envValue != nil && !areEqualStringSlice(envValue, defaultValue.([]string)) {
 				conf.SetValue(envValue)
 			}

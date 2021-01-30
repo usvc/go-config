@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"testing"
 
 	"github.com/spf13/pflag"
@@ -45,4 +46,16 @@ func (s *StringSliceTests) TestApplyToFlagSet() {
 	val, err = flagSet.GetStringSlice("with-shorthand")
 	s.Nil(err)
 	s.Equal([]string{}, val)
+}
+
+func (s *StringSliceTests) TestLoadFromEnvironment() {
+	os.Setenv("TEST_STRING_SLICE", "a,b,c")
+	testMap := Map{
+		"test-string-slice": &StringSlice{
+			Default: []string{"d", "e", "f"},
+		},
+	}
+	testMap.LoadFromEnvironment()
+	stringSlice := testMap.GetStringSlice("test-string-slice")
+	s.Equal([]string{"a", "b", "c"}, stringSlice)
 }
