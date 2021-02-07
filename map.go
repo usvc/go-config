@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -62,7 +61,6 @@ func (m *Map) LoadFromEnvironment() {
 			// -  https://github.com/spf13/viper/issues/380
 			env.Set(envKey, strings.ReplaceAll(env.GetString(envKey), ",", " "))
 			envValue := env.GetStringSlice(envKey)
-			fmt.Println(envValue)
 			if envValue != nil && !areEqualStringSlice(envValue, defaultValue.([]string)) {
 				conf.SetValue(envValue)
 			}
