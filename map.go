@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -15,6 +16,15 @@ type Map map[string]Config
 // of Map to a cobra.Command instance as flags (cannot be accessed
 // by child commands)
 func (m *Map) ApplyToCobra(command *cobra.Command) {
+	existingPreRunE := command.PreRunE
+	prerun := func(cmd *cobra.Command, args []string) error {
+		m.LoadFromEnvironment()
+		if existingPreRunE != nil {
+			return existingPreRunE(cmd, args)
+		}
+		return nil
+	}
+	command.PreRunE = prerun
 	m.ApplyToFlagSet(command.Flags())
 }
 
@@ -47,6 +57,7 @@ func (m *Map) LoadFromEnvironment() {
 	env.AutomaticEnv()
 	for rawEnvKey, conf := range *m {
 		envKey := normalizeName(rawEnvKey, separatorEnv)
+		flagValue := conf.GetValue()
 		defaultValue := conf.GetDefault()
 		switch conf.(type) {
 		case *String:
@@ -61,27 +72,30 @@ func (m *Map) LoadFromEnvironment() {
 			// -  https://github.com/spf13/viper/issues/380
 			env.Set(envKey, strings.ReplaceAll(env.GetString(envKey), ",", " "))
 			envValue := env.GetStringSlice(envKey)
-			if envValue != nil && !areEqualStringSlice(envValue, defaultValue.([]string)) {
+			if envValue != nil &&
+				!isZeroValue(envValue) &&
+				!areEqualStringSlice(envValue, defaultValue.([]string)) &&
+				areEqualStringSlice(flagValue.([]string), defaultValue.([]string)) {
 				conf.SetValue(envValue)
 			}
 		case *Int:
 			envValue := env.GetInt(envKey)
-			if envValue != defaultValue {
+			if envValue != defaultValue && !isZeroValue(envValue) {
 				conf.SetValue(envValue)
 			}
 		case *Uint:
 			envValue := env.GetUint(envKey)
-			if envValue != defaultValue {
+			if envValue != defaultValue && !isZeroValue(envValue) {
 				conf.SetValue(envValue)
 			}
 		case *Float:
 			envValue := env.GetFloat64(envKey)
-			if envValue != defaultValue {
+			if envValue != defaultValue && !isZeroValue(envValue) {
 				conf.SetValue(envValue)
 			}
 		case *Bool:
 			envValue := env.GetBool(envKey)
-			if envValue != defaultValue {
+			if envValue != defaultValue && !isZeroValue(envValue) {
 				conf.SetValue(envValue)
 			}
 		}
@@ -141,4 +155,32 @@ func (m Map) GetUint(id string) uint {
 // by the key :id as an unsigned intger slice type
 func (m Map) GetUintSlice(id string) []uint {
 	return m.Get(id).([]uint)
+}
+
+func (m Map) Reset() error {
+	for key, conf := range m {
+		switch conf.GetDefault().(type) {
+		case bool:
+			conf.SetValue(*new(bool))
+		case int:
+			conf.SetValue(*new(int))
+		case []int:
+			conf.SetValue(*new([]int))
+		case string:
+			conf.SetValue(*new(string))
+		case []string:
+			conf.SetValue(*new([]string))
+		case uint:
+			conf.SetValue(*new(uint))
+		case []uint:
+			conf.SetValue(*new([]uint))
+		case float64:
+			conf.SetValue(*new(float64))
+		case []float64:
+			conf.SetValue(*new([]float64))
+		default:
+			return fmt.Errorf("failed to reset configuration key '%s' of unknown type", key)
+		}
+	}
+	return nil
 }
