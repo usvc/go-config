@@ -4,93 +4,107 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/suite"
 )
 
 type e2eTests struct {
 	suite.Suite
+	command                          *cobra.Command
+	expectedStringSliceOutput        string
+	expectedDefaultStringSliceOutput string
+	inputStringSlice                 []string
+	inputStringSliceAlternate        []string
+	output                           *bytes.Buffer
 }
 
 func Test_e2e(t *testing.T) {
 	suite.Run(t, &e2eTests{})
 }
 
-func (s e2eTests) Test_StringSlice_EnvFormat() {
-	var out bytes.Buffer
-	command := GetCommand()
-	conf.ApplyToCobra(command)
-	command.SetOut(&out)
+func (s *e2eTests) BeforeTest(suite, test string) {
+	s.inputStringSlice = []string{"a", "ab", "abc"}
+	s.inputStringSliceAlternate = []string{"z", "zy", "zyx"}
+	s.expectedStringSliceOutput = fmt.Sprintf("%s: [a ab abc] (length: 3)", ParamStringSlice)
+	s.expectedDefaultStringSliceOutput = fmt.Sprintf("%s: [%s] (length: 2)", ParamStringSlice, "hello world")
+}
 
-	os.Setenv("STRING_SLICE", "g,h,i")
-	command.Execute()
-	s.Contains(out.String(), fmt.Sprintf("%s: [g h i] (length: 3)", ParamStringSlice),
+func (s *e2eTests) SetupTest() {
+	fmt.Println("SetupTest")
+	s.output = bytes.NewBuffer([]byte{})
+	s.command = GetCommand()
+	conf = NewConfiguration()
+	conf.ApplyToCobra(s.command)
+	s.command.SetOut(s.output)
+}
+
+func (s e2eTests) Test_StringSlice_env_comma_delimited() {
+	os.Setenv("STRING_SLICE", strings.Join(s.inputStringSlice, ","))
+	defer os.Setenv("STRING_SLICE", "")
+	s.command.Execute()
+	s.Contains(s.output.String(), s.expectedStringSliceOutput,
 		"it should correctly parse comma delimited values in the envionment")
-	out.Reset()
-	conf.Reset()
+}
 
-	os.Setenv("STRING_SLICE", "j k l")
-	command.Execute()
-	s.Contains(out.String(), fmt.Sprintf("%s: [j k l] (length: 3)", ParamStringSlice),
+func (s e2eTests) Test_StringSlice_env_space_delimited() {
+	os.Setenv("STRING_SLICE", strings.Join(s.inputStringSlice, " "))
+	defer os.Setenv("STRING_SLICE", "")
+	s.command.Execute()
+	s.Contains(s.output.String(), s.expectedStringSliceOutput,
 		"it should correctly parse space delimited values in the envionment")
-	out.Reset()
-	conf.Reset()
-	os.Setenv("STRING_SLICE", "")
 }
 
-func (s e2eTests) Test_StringSlice_FlagFormat() {
-	var out bytes.Buffer
-	command := GetCommand()
-	conf.ApplyToCobra(command)
-	command.SetOut(&out)
-
-	command.SetArgs([]string{"--string-slice", "a", "--string-slice", "b", "--string-slice", "c"})
-	command.Execute()
-	s.Contains(out.String(), fmt.Sprintf("%s: [a b c] (length: 3)", ParamStringSlice),
+func (s e2eTests) Test_StringSlice_flag_flag_delimited() {
+	args := []string{}
+	for i := 0; i < len(s.inputStringSlice); i++ {
+		args = append(args, "--string-slice", s.inputStringSlice[i])
+	}
+	s.command.SetArgs(args)
+	defer s.command.SetArgs([]string{})
+	s.command.Execute()
+	s.Contains(s.output.String(), s.expectedStringSliceOutput,
 		"it should correctly parse flag delimited values in flags")
-	out.Reset()
-	conf.Reset()
-
-	command.SetArgs([]string{"--string-slice", "d,e,f"})
-	command.Execute()
-	s.Contains(out.String(), fmt.Sprintf("%s: [d e f] (length: 3)", ParamStringSlice),
-		"it should correctly parse comma delimited values in flags")
-	out.Reset()
-	conf.Reset()
 }
 
-func (s e2eTests) Test_StringSlice_Input() {
-	var out bytes.Buffer
-	command := GetCommand()
-	conf.ApplyToCobra(command)
-	command.SetOut(&out)
+func (s e2eTests) Test_StringSlice_flag_comma_delimited() {
+	s.command.SetArgs([]string{"--string-slice", strings.Join(s.inputStringSlice, ",")})
+	defer s.command.SetArgs([]string{})
+	s.command.Execute()
+	s.Contains(s.output.String(), s.expectedStringSliceOutput,
+		"it should correctly parse comma delimited values in flags")
+}
 
-	command.Execute()
-	s.Contains(out.String(), fmt.Sprintf("%s: [hello world] (length: 2)", ParamStringSlice),
+func (s e2eTests) Test_StringSlice_priority_defaults() {
+	s.command.Execute()
+	s.Contains(s.output.String(), s.expectedDefaultStringSliceOutput,
 		"it should consume the default value when neither environment nor flag is set")
-	out.Reset()
-	conf.Reset()
+}
 
-	command.SetArgs([]string{"--string-slice", "a,b,c"})
-	command.Execute()
-	s.Contains(out.String(), fmt.Sprintf("%s: [a b c] (length: 3)", ParamStringSlice),
+func (s e2eTests) Test_StringSlice_priority_only_flag() {
+	s.command.SetArgs([]string{"--string-slice", strings.Join(s.inputStringSlice, ",")})
+	defer s.command.SetArgs([]string{})
+	s.command.Execute()
+	s.Contains(s.output.String(), s.expectedStringSliceOutput,
 		"it should consume the flag's value when only the flag value is set")
-	out.Reset()
-	conf.Reset()
-	command.SetArgs([]string{})
+}
 
-	os.Setenv("STRING_SLICE", "d,e,f")
-	command.Execute()
-	s.Contains(out.String(), fmt.Sprintf("%s: [d e f] (length: 3)", ParamStringSlice),
+func (s e2eTests) Test_StringSlice_priority_only_env() {
+	os.Setenv("STRING_SLICE", strings.Join(s.inputStringSlice, ","))
+	defer os.Setenv("STRING_SLICE", "")
+	s.command.Execute()
+	s.Contains(s.output.String(), s.expectedStringSliceOutput,
 		"it should consume the environment value when only environment value is set")
-	out.Reset()
-	conf.Reset()
+}
 
-	command.SetArgs([]string{"--string-slice", "g,h,i"})
-	command.Execute()
-	s.Contains(out.String(), fmt.Sprintf("%s: [g h i] (length: 3)", ParamStringSlice),
+func (s e2eTests) Test_StringSlice_priority_flag_and_env() {
+	s.command.SetArgs([]string{"--string-slice", strings.Join(s.inputStringSlice, ",")})
+	defer s.command.SetArgs([]string{})
+	os.Setenv("STRING_SLICE", strings.Join(s.inputStringSliceAlternate, ","))
+	defer os.Setenv("STRING_SLICE", "")
+	s.command.Execute()
+	s.Contains(s.output.String(), s.expectedStringSliceOutput,
 		"it should consume the flag's value when both environment and flag is set")
-	out.Reset()
-	conf.Reset()
 }

@@ -16,15 +16,14 @@ type Map map[string]Config
 // of Map to a cobra.Command instance as flags (cannot be accessed
 // by child commands)
 func (m *Map) ApplyToCobra(command *cobra.Command) {
-	existingPreRunE := command.PreRunE
-	prerun := func(cmd *cobra.Command, args []string) error {
+	preRunE := command.PreRunE
+	command.PreRunE = func(cmd *cobra.Command, args []string) error {
 		m.LoadFromEnvironment()
-		if existingPreRunE != nil {
-			return existingPreRunE(cmd, args)
+		if preRunE != nil {
+			return preRunE(cmd, args)
 		}
 		return nil
 	}
-	command.PreRunE = prerun
 	m.ApplyToFlagSet(command.Flags())
 }
 
@@ -32,6 +31,14 @@ func (m *Map) ApplyToCobra(command *cobra.Command) {
 // of Map to a cobra.Command instance as persistent flags (can be
 // accessed by child commands)
 func (m *Map) ApplyToCobraPersistent(command *cobra.Command) {
+	persistentPreRunE := command.PersistentPreRunE
+	command.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		m.LoadFromEnvironment()
+		if persistentPreRunE != nil {
+			return persistentPreRunE(cmd, args)
+		}
+		return nil
+	}
 	m.ApplyToFlagSet(command.PersistentFlags())
 }
 

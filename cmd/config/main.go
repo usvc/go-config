@@ -6,9 +6,10 @@ var (
 	Timestamp string
 )
 
+var conf = NewConfiguration()
+
 func main() {
 	rootCommand := GetCommand()
-	conf.LoadFromEnvironment()
 	conf.ApplyToCobra(rootCommand)
 	rootCommand.Execute()
 }
