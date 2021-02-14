@@ -17,13 +17,22 @@ type Map map[string]Config
 // of Map to a cobra.Command instance as flags (cannot be accessed
 // by child commands)
 func (m *Map) ApplyToCobra(command *cobra.Command) {
-	preRunE := command.PreRunE
-	command.PreRunE = func(cmd *cobra.Command, args []string) error {
+	preRun := command.PreRun
+	command.PreRun = func(cmd *cobra.Command, args []string) {
 		m.LoadFromEnvironment()
-		if preRunE != nil {
-			return preRunE(cmd, args)
+		if preRun != nil {
+			preRun(cmd, args)
 		}
-		return nil
+	}
+	if command.PreRunE != nil {
+		preRunE := command.PreRunE
+		command.PreRunE = func(cmd *cobra.Command, args []string) error {
+			m.LoadFromEnvironment()
+			if preRunE != nil {
+				return preRunE(cmd, args)
+			}
+			return nil
+		}
 	}
 	m.ApplyToFlagSet(command.Flags())
 }
@@ -32,13 +41,22 @@ func (m *Map) ApplyToCobra(command *cobra.Command) {
 // of Map to a cobra.Command instance as persistent flags (can be
 // accessed by child commands)
 func (m *Map) ApplyToCobraPersistent(command *cobra.Command) {
-	persistentPreRunE := command.PersistentPreRunE
-	command.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+	persistentPreRun := command.PersistentPreRun
+	command.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		m.LoadFromEnvironment()
-		if persistentPreRunE != nil {
-			return persistentPreRunE(cmd, args)
+		if persistentPreRun != nil {
+			persistentPreRun(cmd, args)
 		}
-		return nil
+	}
+	if command.PersistentPreRunE != nil {
+		persistentPreRunE := command.PersistentPreRunE
+		command.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+			m.LoadFromEnvironment()
+			if persistentPreRunE != nil {
+				return persistentPreRunE(cmd, args)
+			}
+			return nil
+		}
 	}
 	m.ApplyToFlagSet(command.PersistentFlags())
 }
@@ -183,6 +201,8 @@ func (m Map) Reset() error {
 		switch conf.GetDefault().(type) {
 		case bool:
 			conf.SetValue(*new(bool))
+		case float64:
+			conf.SetValue(*new(float64))
 		case int:
 			conf.SetValue(*new(int))
 		case []int:
@@ -193,12 +213,6 @@ func (m Map) Reset() error {
 			conf.SetValue(*new([]string))
 		case uint:
 			conf.SetValue(*new(uint))
-		case []uint:
-			conf.SetValue(*new([]uint))
-		case float64:
-			conf.SetValue(*new(float64))
-		case []float64:
-			conf.SetValue(*new([]float64))
 		default:
 			return fmt.Errorf("failed to reset configuration key '%s' of unknown type", key)
 		}
