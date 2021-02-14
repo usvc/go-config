@@ -46,3 +46,37 @@ func (s *UintTests) TestApplyToFlagSet() {
 	s.Nil(err)
 	s.Equal(uint(0), val)
 }
+
+func (s *UintTests) Test_IsSetExplicitlyByFlag() {
+	flags := &pflag.FlagSet{}
+	conf := &Uint{}
+	conf.ApplyToFlagSet("test", flags)
+	s.False(conf.IsSetExplicitlyByFlag())
+	flags.Set("test", "1")
+	s.True(conf.IsSetExplicitlyByFlag())
+}
+
+func (s *UintTests) Test_IsSet() {
+	conf := &Uint{}
+	s.False(conf.IsSet())
+	s.Nil(conf.SetValue(uint(1)))
+	s.True(conf.IsSet())
+}
+
+func (s *UintTests) Test_GettersSetters() {
+	conf := &Uint{
+		Default:   uint(1),
+		Value:     uint(2),
+		Shorthand: "t",
+		Usage:     "usage",
+	}
+	s.Equal(uint(1), conf.GetDefault())
+	s.Equal(uint(2), conf.GetValue())
+	s.Equal("t", conf.GetShorthand())
+	s.Equal("usage", conf.GetUsage())
+	valuePointer, ok := conf.GetValuePointer().(*uint)
+	s.True(ok)
+	s.Equal(conf.GetValue(), *valuePointer)
+	s.Nil(conf.SetValue(uint(3)))
+	s.Equal(uint(3), conf.GetValue())
+}

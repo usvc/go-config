@@ -46,3 +46,38 @@ func (s *BoolTests) TestApplyToFlagSet() {
 	s.Nil(err)
 	s.Equal(false, val)
 }
+
+func (s *BoolTests) Test_IsSetExplicitlyByFlag() {
+	flags := &pflag.FlagSet{}
+	conf := &Bool{}
+	conf.ApplyToFlagSet("test", flags)
+	s.False(conf.IsSetExplicitlyByFlag())
+	flags.Set("test", "true")
+	s.True(conf.IsSetExplicitlyByFlag())
+}
+
+func (s *BoolTests) Test_IsSet() {
+	conf := &Bool{}
+	s.False(conf.IsSet())
+	s.Nil(conf.SetValue(true))
+	s.True(conf.IsSet())
+}
+
+func (s *BoolTests) Test_GettersSetters() {
+	conf := &Bool{
+		Default:   true,
+		Value:     false,
+		Shorthand: "t",
+		Usage:     "usage",
+	}
+	s.Equal(true, conf.GetDefault())
+	s.Equal(true, conf.GetValue())
+	s.Equal("t", conf.GetShorthand())
+	s.Equal("usage", conf.GetUsage())
+	valuePointer, ok := conf.GetValuePointer().(*bool)
+	s.True(ok)
+	s.NotEqual(conf.GetValue(), *valuePointer,
+		"the value of .Value and .GetValue() shoudld be different in this edge case")
+	s.Nil(conf.SetValue(false))
+	s.Equal(false, conf.GetValue())
+}

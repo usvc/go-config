@@ -168,12 +168,3 @@ func (s *UtilsTests) Test_normalizeName_specials() {
 		s.Equal(expected, normalizeName(input, '_'))
 	}
 }
-
-func (s *UtilsTests) Test_shouldEnvironmentVariableBeSet() {
-	envValue := "a"
-	conf := &String{
-		Default: "a",
-		Value:   "a",
-	}
-	s.False(shouldEnvironmentVariableBeSet(envValue, conf))
-}

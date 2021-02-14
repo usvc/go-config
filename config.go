@@ -14,5 +14,5 @@ type Config interface {
 	GetValue() interface{}
 	GetValuePointer() interface{}
 	IsSetExplicitlyByFlag() bool
-	SetValue(value interface{})
+	SetValue(value interface{}) (err error)
 }

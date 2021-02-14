@@ -119,8 +119,16 @@ func (s *MapTests) TestLoadFromEnvironment_uint() {
 func (s *MapTests) TestGetBool() {
 	expectedName := "bool"
 	expectedValue := true
-	expectedConfig := Bool{Value: expectedValue}
+	expectedConfig := Bool{Default: false}
+	expectedConfig.SetValue(true)
 	conf := Map{
+		expectedName: &expectedConfig,
+	}
+
+	expectedValue = false
+	expectedConfig = Bool{Default: true}
+	expectedConfig.SetValue(false)
+	conf = Map{
 		expectedName: &expectedConfig,
 	}
 	s.Equal(expectedValue, conf.GetBool(expectedName))

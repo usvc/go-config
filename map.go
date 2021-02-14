@@ -70,7 +70,7 @@ func (m *Map) LoadFromEnvironment() {
 		switch conf.(type) {
 		case *String:
 			envValue := env.GetString(envKey)
-			if shouldEnvironmentVariableBeSet(envValue, conf) {
+			if !conf.IsSetExplicitlyByFlag() {
 				conf.SetValue(envValue)
 			}
 		case *StringSlice:
@@ -89,7 +89,7 @@ func (m *Map) LoadFromEnvironment() {
 			}
 		case *Int:
 			envValue := env.GetInt(envKey)
-			if shouldEnvironmentVariableBeSet(envValue, conf) {
+			if !conf.IsSetExplicitlyByFlag() {
 				conf.SetValue(envValue)
 			}
 		case *IntSlice:
@@ -112,17 +112,17 @@ func (m *Map) LoadFromEnvironment() {
 			}
 		case *Uint:
 			envValue := env.GetUint(envKey)
-			if shouldEnvironmentVariableBeSet(envValue, conf) {
+			if !conf.IsSetExplicitlyByFlag() {
 				conf.SetValue(envValue)
 			}
 		case *Float:
 			envValue := env.GetFloat64(envKey)
-			if shouldEnvironmentVariableBeSet(envValue, conf) {
+			if !conf.IsSetExplicitlyByFlag() {
 				conf.SetValue(envValue)
 			}
 		case *Bool:
 			envValue := env.GetBool(envKey)
-			if shouldEnvironmentVariableBeSet(envValue, conf) {
+			if !conf.IsSetExplicitlyByFlag() {
 				conf.SetValue(envValue)
 			}
 		}

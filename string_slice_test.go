@@ -1,7 +1,6 @@
 package config
 
 import (
-	"os"
 	"testing"
 
 	"github.com/spf13/pflag"
@@ -48,14 +47,36 @@ func (s *StringSliceTests) TestApplyToFlagSet() {
 	s.Equal([]string{}, val)
 }
 
-func (s *StringSliceTests) TestLoadFromEnvironment() {
-	os.Setenv("TEST_STRING_SLICE", "a,b,c")
-	testMap := Map{
-		"test-string-slice": &StringSlice{
-			Default: []string{"d", "e", "f"},
-		},
+func (s *StringSliceTests) Test_IsSetExplicitlyByFlag() {
+	flags := &pflag.FlagSet{}
+	conf := &StringSlice{}
+	conf.ApplyToFlagSet("test", flags)
+	s.False(conf.IsSetExplicitlyByFlag())
+	flags.Set("test", "hello,world")
+	s.True(conf.IsSetExplicitlyByFlag())
+}
+
+func (s *StringSliceTests) Test_IsSet() {
+	conf := &StringSlice{}
+	s.False(conf.IsSet())
+	s.Nil(conf.SetValue([]string{"hello", "world"}))
+	s.True(conf.IsSet())
+}
+
+func (s *StringSliceTests) Test_GettersSetters() {
+	conf := &StringSlice{
+		Default:   []string{"hello", "world"},
+		Value:     []string{"hola", "mundo"},
+		Shorthand: "t",
+		Usage:     "usage",
 	}
-	testMap.LoadFromEnvironment()
-	stringSlice := testMap.GetStringSlice("test-string-slice")
-	s.Equal([]string{"a", "b", "c"}, stringSlice)
+	s.Equal([]string{"hello", "world"}, conf.GetDefault())
+	s.Equal([]string{"hola", "mundo"}, conf.GetValue())
+	s.Equal("t", conf.GetShorthand())
+	s.Equal("usage", conf.GetUsage())
+	valuePointer, ok := conf.GetValuePointer().(*[]string)
+	s.True(ok)
+	s.Equal(conf.GetValue(), *valuePointer)
+	s.Nil(conf.SetValue([]string{"halo", "dunia"}))
+	s.Equal([]string{"halo", "dunia"}, conf.GetValue())
 }

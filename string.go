@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+
 	"github.com/spf13/pflag"
 )
 
@@ -73,14 +75,20 @@ func (s *String) GetValuePointer() interface{} {
 
 // GetValue returns the value of this configuration
 func (s *String) GetValue() interface{} {
-	if isZeroValue(s.Value) {
+	if !s.IsSet() && !s.IsSetExplicitlyByFlag() && isZeroValue(s.Value) {
 		return s.Default
 	}
 	return s.Value
 }
 
 // SetValue sets the value of this configuration
-func (s *String) SetValue(value interface{}) {
+func (s *String) SetValue(value interface{}) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("%s", r)
+		}
+	}()
 	s.Value = value.(string)
 	s.isSet = true
+	return nil
 }

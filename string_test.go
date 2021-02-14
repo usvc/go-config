@@ -46,3 +46,37 @@ func (s *StringTests) TestApplyToFlagSet() {
 	s.Nil(err)
 	s.Equal("", val)
 }
+
+func (s *StringTests) Test_IsSetExplicitlyByFlag() {
+	flags := &pflag.FlagSet{}
+	conf := &String{}
+	conf.ApplyToFlagSet("test", flags)
+	s.False(conf.IsSetExplicitlyByFlag())
+	flags.Set("test", "test")
+	s.True(conf.IsSetExplicitlyByFlag())
+}
+
+func (s *StringTests) Test_IsSet() {
+	conf := &String{}
+	s.False(conf.IsSet())
+	s.Nil(conf.SetValue("test"))
+	s.True(conf.IsSet())
+}
+
+func (s *StringTests) Test_GettersSetters() {
+	conf := &String{
+		Default:   "default",
+		Value:     "value",
+		Shorthand: "t",
+		Usage:     "usage",
+	}
+	s.Equal("default", conf.GetDefault())
+	s.Equal("value", conf.GetValue())
+	s.Equal("t", conf.GetShorthand())
+	s.Equal("usage", conf.GetUsage())
+	valuePointer, ok := conf.GetValuePointer().(*string)
+	s.True(ok)
+	s.Equal(conf.GetValue(), *valuePointer)
+	s.Nil(conf.SetValue("new value"))
+	s.Equal("new value", conf.GetValue())
+}

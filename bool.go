@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+
 	"github.com/spf13/pflag"
 )
 
@@ -61,21 +63,29 @@ func (s *Bool) GetUsage() string {
 	return s.Usage
 }
 
-// GetValuePointer returns a pointer that points to the instance of the configured value
+// GetValuePointer returns a pointer that points to the instance of the configured value.
+// Be aware that this pointer points to the raw .Value value and does not take into account
+// defaults that may have been specified which .GetValue() does
 func (s *Bool) GetValuePointer() interface{} {
 	return &s.Value
 }
 
 // GetValue returns the value of this configuration
 func (s *Bool) GetValue() interface{} {
-	if isZeroValue(s.Value) {
-		return s.Default
+	if s.IsSet() || s.IsSetExplicitlyByFlag() {
+		return s.Value
 	}
-	return s.Value
+	return s.Default
 }
 
 // SetValue sets the value of this configuration
-func (s *Bool) SetValue(value interface{}) {
+func (s *Bool) SetValue(value interface{}) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("%s", r)
+		}
+	}()
 	s.Value = value.(bool)
 	s.isSet = true
+	return nil
 }

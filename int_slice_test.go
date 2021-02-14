@@ -46,3 +46,37 @@ func (s *IntSliceTests) TestApplyToFlagSet() {
 	s.Nil(err)
 	s.Equal([]int{}, val)
 }
+
+func (s *IntSliceTests) Test_IsSetExplicitlyByFlag() {
+	flags := &pflag.FlagSet{}
+	conf := &IntSlice{}
+	conf.ApplyToFlagSet("test", flags)
+	s.False(conf.IsSetExplicitlyByFlag())
+	flags.Set("test", "1,2,3,4")
+	s.True(conf.IsSetExplicitlyByFlag())
+}
+
+func (s *IntSliceTests) Test_IsSet() {
+	conf := &IntSlice{}
+	s.False(conf.IsSet())
+	s.Nil(conf.SetValue([]int{1, 2, 3, 4}))
+	s.True(conf.IsSet())
+}
+
+func (s *IntSliceTests) Test_GettersSetters() {
+	conf := &IntSlice{
+		Default:   []int{1, 2, 3, 4},
+		Value:     []int{-1, -2, -3, -4},
+		Shorthand: "t",
+		Usage:     "usage",
+	}
+	s.Equal([]int{1, 2, 3, 4}, conf.GetDefault())
+	s.Equal([]int{-1, -2, -3, -4}, conf.GetValue())
+	s.Equal("t", conf.GetShorthand())
+	s.Equal("usage", conf.GetUsage())
+	valuePointer, ok := conf.GetValuePointer().(*[]int)
+	s.True(ok)
+	s.Equal(conf.GetValue(), *valuePointer)
+	s.Nil(conf.SetValue([]int{-1, 2, -3, 4}))
+	s.Equal([]int{-1, 2, -3, 4}, conf.GetValue())
+}
