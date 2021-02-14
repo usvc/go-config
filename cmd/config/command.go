@@ -31,8 +31,6 @@ func GetCommand() *cobra.Command {
 				switch v := conf.GetValue().(type) {
 				case []string:
 					length = len(v)
-				case []uint:
-					length = len(v)
 				case []int:
 					length = len(v)
 				}
