@@ -79,4 +79,6 @@ func (s *UintTests) Test_GettersSetters() {
 	s.Equal(conf.GetValue(), *valuePointer)
 	s.Nil(conf.SetValue(uint(3)))
 	s.Equal(uint(3), conf.GetValue())
+
+	s.Contains(conf.SetValue("").Error(), "interface {} is string, not uint")
 }

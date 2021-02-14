@@ -79,4 +79,6 @@ func (s *StringSliceTests) Test_GettersSetters() {
 	s.Equal(conf.GetValue(), *valuePointer)
 	s.Nil(conf.SetValue([]string{"halo", "dunia"}))
 	s.Equal([]string{"halo", "dunia"}, conf.GetValue())
+
+	s.Contains(conf.SetValue("").Error(), "interface {} is string, not []string")
 }

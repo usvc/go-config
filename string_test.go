@@ -79,4 +79,6 @@ func (s *StringTests) Test_GettersSetters() {
 	s.Equal(conf.GetValue(), *valuePointer)
 	s.Nil(conf.SetValue("new value"))
 	s.Equal("new value", conf.GetValue())
+
+	s.Contains(conf.SetValue(5).Error(), "interface {} is int, not string")
 }

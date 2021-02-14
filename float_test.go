@@ -79,4 +79,6 @@ func (s *FloatTests) Test_GettersSetters() {
 	s.Equal(conf.GetValue(), *valuePointer)
 	s.Nil(conf.SetValue(3.142))
 	s.Equal(3.142, conf.GetValue())
+
+	s.Contains(conf.SetValue("").Error(), "interface {} is string, not float")
 }

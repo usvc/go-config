@@ -79,4 +79,6 @@ func (s *IntSliceTests) Test_GettersSetters() {
 	s.Equal(conf.GetValue(), *valuePointer)
 	s.Nil(conf.SetValue([]int{-1, 2, -3, 4}))
 	s.Equal([]int{-1, 2, -3, 4}, conf.GetValue())
+
+	s.Contains(conf.SetValue("").Error(), "interface {} is string, not []int")
 }

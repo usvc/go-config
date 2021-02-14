@@ -80,4 +80,6 @@ func (s *BoolTests) Test_GettersSetters() {
 		"the value of .Value and .GetValue() shoudld be different in this edge case")
 	s.Nil(conf.SetValue(false))
 	s.Equal(false, conf.GetValue())
+
+	s.Contains(conf.SetValue("").Error(), "interface {} is string, not bool")
 }
