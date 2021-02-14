@@ -123,6 +123,8 @@ func (s *UtilsTests) Test_isZeroValue() {
 	s.True(isZeroValue(boolValue))
 	var intValue int
 	s.True(isZeroValue(intValue))
+	var intSliceValue []int
+	s.True(isZeroValue(intSliceValue))
 	var stringValue string
 	s.True(isZeroValue(stringValue))
 	var uintValue uint
