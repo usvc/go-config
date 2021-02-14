@@ -16,25 +16,24 @@ A Go package to deal with configuration.
 - - -
 
 - [Config](#config)
-  - [Usage](#usage)
-    - [Importing](#importing)
-    - [Defining configuration](#defining-configuration)
-    - [Consuming from environment](#consuming-from-environment)
-    - [Applying to Cobra (`github.com/spf13/cobra` package)](#applying-to-cobra-githubcomspf13cobra-package)
-    - [Deciding environment/flag precedence](#deciding-environmentflag-precedence)
-    - [Retrieving values frrom the configuration](#retrieving-values-frrom-the-configuration)
-    - [Note on `*`Slice types](#note-on-slice-types)
-    - [Note on configuration names](#note-on-configuration-names)
-  - [Example CLI Application](#example-cli-application)
-  - [Development Runbook](#development-runbook)
-    - [Getting Started](#getting-started)
-    - [Continuous Integration (CI) Pipeline](#continuous-integration-ci-pipeline)
-      - [On Github](#on-github)
-        - [Releasing](#releasing)
-      - [On Gitlab](#on-gitlab)
-        - [Version Bumping](#version-bumping)
-        - [DockerHub Publishing](#dockerhub-publishing)
-  - [Licensing](#licensing)
+	- [Usage](#usage)
+		- [Importing](#importing)
+		- [Defining configuration](#defining-configuration)
+		- [Consuming from environment](#consuming-from-environment)
+		- [Applying to Cobra (`github.com/spf13/cobra` package)](#applying-to-cobra-githubcomspf13cobra-package)
+		- [Retrieving values frrom the configuration](#retrieving-values-frrom-the-configuration)
+		- [Note on `*`Slice types](#note-on-slice-types)
+		- [Note on configuration names](#note-on-configuration-names)
+	- [Example CLI Application](#example-cli-application)
+	- [Development Runbook](#development-runbook)
+		- [Getting Started](#getting-started)
+		- [Continuous Integration (CI) Pipeline](#continuous-integration-ci-pipeline)
+			- [On Github](#on-github)
+				- [Releasing](#releasing)
+			- [On Gitlab](#on-gitlab)
+				- [Version Bumping](#version-bumping)
+				- [DockerHub Publishing](#dockerhub-publishing)
+	- [Licensing](#licensing)
 
 ## Usage
 
@@ -99,13 +98,6 @@ var conf = config.Map{
 		Shorthand: "u",
 		Usage:     "specifies an unsigned integer value",
 	},
-	// with env : UINT_SLICE="123 456"
-	// with flag: --uint-slice 123,456 | -U 123,456
-	"uint slice": &config.UintSlice{
-		Default:   []uint{2, 3},
-		Shorthand: "U",
-		Usage:     "specifies a slice of unsigned integers value",
-	},
 }
 ```
 
@@ -123,58 +115,64 @@ conf.LoadFromEnvironment()
 
 ```go
 cmd := cobra.Command { /* ... config ... */ }
-conf.ApplyToCobra(cmd)
+/* ... everything else ... */
+conf.ApplyToCobra(&cmd)
+// OR
+conf.ApplyToCobraPersistent(&cmd)
+cmd.Execute()
 ```
 
-### Deciding environment/flag precedence
-
-> Following example assumes the above `conf` variable was defined.
-
-To give priority to environment variables first, call `LoadFromEnvironment()` outside of the `cobra.Command`'s runtime functions (eg. `PreRun`/`Run`)
-
-```go
-func main() {
-  cmd := cobra.Command{ /* ... config ... */ }
-  conf.ApplyToCobra(cmd)
-  conf.LoadFromEnvironment()
-  cmd.Execute()
-}
-```
-
-To give priority to values from flags first, call `LoadFromEnvironment()` inside one of `cobra.Command`'s runtime functions:
-
-```go
-func main() {
-  cmd := cobra.Command{
-    // ... other config ...
-    PreRun: func(c *cobra.Command, args []string) {
-      conf.LoadFromEnvironment()
-    },
-    // ... other config ...
-  }
-  conf.ApplyToCobra(cmd)
-  cmd.Execute()
-}
-```
+When using `conf.ApplyToCobra()` or `conf.ApplyToCobraPersistent()`, **the flag takes priority** if the equivalent environment variable was also defined. This is the behaviour since 0.2.5.
 
 ### Retrieving values frrom the configuration
 
 > Following example assumes the above `conf` variable was defined.
 
 ```go
-fmt.Println("bool     : %v", conf.GetValue())
-fmt.Println("float    : %v", conf.GetValue())
-fmt.Println("int      : %v", conf.GetValue())
-fmt.Println("[]int    : %v", conf.GetValue())
-fmt.Println("string   : %s", conf.GetValue())
-fmt.Println("[]string : %v", conf.GetValue())
-fmt.Println("uint     : %v", conf.GetValue())
-fmt.Println("[]uint   : %v", conf.GetValue())
+fmt.Println("bool         : %v", conf.GetBool("bool"))
+fmt.Println("float        : %v", conf.GetFloat("float"))
+fmt.Println("int          : %v", conf.GetInt("int"))
+fmt.Println("int slice    : %v", conf.GetIntSlice("int slice"))
+fmt.Println("string       : %s", conf.GetString("string"))
+fmt.Println("string slice : %v", conf.GetStringSlice("string slice"))
+fmt.Println("uint         : %v", conf.GetUint("uint"))
 ```
+
+If you've applied the above `config.Map` instance to Cobra, running the following:
+
+```sh
+go run ./cmd/config \
+	--bool=true \
+	--float 3.142 \
+	--int 1 \
+	--int-slice 1,-2,3,-4,5 \
+	--string a \
+	--string-slice a,b,c,d,e \
+	--uint 1
+```
+
+Should result in the following output:
+
+```
+uint: 1
+bool: true
+float: 3.142
+int: 1
+int slice: [1 -2 3 -4 5] (length: 5)
+string: a
+string slice: [a b c d e] (length: 5)
+```
+
+If you ran the following:
+
+```sh
+
+```
+
 
 ### Note on `*`Slice types
 
-For the slice types (`IntSlice`, `StringSlice`, `UintSlice`), when running in flag mode, the delimiter is a comma (`,`), but in environment variable mode, the delimiter is a space (` `). This is because of how the underlying package (`github.com/spf13/viper`) does the string splitting.
+For the slice types (`IntSlice`, `StringSlice`), the delimiter is a comma (`,`) despite the underlying package (`github.com/spf13/viper`) handling the splitting a little differently. A tiny hack (famous last words: sorry, me-in-2025) was made to parse these using commas instead of spaces.
 
 ### Note on configuration names
 
@@ -216,10 +214,6 @@ STRING_SLICE="hello world" go run ./cmd/config
 # uint
 go run ./cmd/config --uint 12345
 UINT=12345 go run ./cmd/config
-
-# []uint
-go run ./cmd/config --uint-slice 12345 --uint-slice 67890
-UINT_SLICE="12345 67890" go run ./cmd/config
 ```
 
 ## Development Runbook

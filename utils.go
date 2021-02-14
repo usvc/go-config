@@ -50,18 +50,6 @@ func areEqualStringSlice(sliceA, sliceB []string) bool {
 	return true
 }
 
-func areEqualUintSlice(sliceA, sliceB []uint) bool {
-	if len(sliceA) != len(sliceB) {
-		return false
-	}
-	for index, value := range sliceA {
-		if value != sliceB[index] {
-			return false
-		}
-	}
-	return true
-}
-
 func assertIDExists(configMap Map, id string) {
 	if configMap[id] == nil {
 		var environmentKeys []string
@@ -76,6 +64,8 @@ func isZeroValue(value interface{}) bool {
 	switch v := value.(type) {
 	case bool:
 		return v == *new(bool)
+	case float64:
+		return v == *new(float64)
 	case int:
 		return v == *new(int)
 	case []int:
@@ -86,12 +76,6 @@ func isZeroValue(value interface{}) bool {
 		return areEqualStringSlice(v, []string{})
 	case uint:
 		return v == *new(uint)
-	case []uint:
-		return areEqualUintSlice(v, []uint{})
-	case float64:
-		return v == *new(float64)
-	case []float64:
-		return areEqualFloatSlice(v, []float64{})
 	default:
 		return v == nil
 	}
@@ -113,4 +97,68 @@ func normalizeName(name string, separator ...rune) string {
 	}
 	returnedName := string(normalizedName)
 	return returnedName
+}
+
+func shouldEnvironmentVariableBeSet(envValue interface{}, conf Config) bool {
+	flagValue := conf.GetValue()
+	defaultValue := conf.GetDefault()
+	isFlagExplicit := conf.IsSetExplicitlyByFlag()
+	switch envValue.(type) {
+	case bool:
+		typedEnvValue := envValue.(bool)
+		typedDefaultValue := defaultValue.(bool)
+		typedFlagValue := flagValue.(bool)
+		if !isZeroValue(typedEnvValue) &&
+			typedEnvValue != typedDefaultValue &&
+			typedFlagValue == typedDefaultValue &&
+			!isFlagExplicit {
+			return true
+		}
+		return false
+	case float64:
+		typedEnvValue := envValue.(float64)
+		typedDefaultValue := defaultValue.(float64)
+		typedFlagValue := flagValue.(float64)
+		if !isZeroValue(typedEnvValue) &&
+			typedEnvValue != typedDefaultValue &&
+			typedFlagValue == typedDefaultValue &&
+			!isFlagExplicit {
+			return true
+		}
+		return false
+	case int:
+		typedEnvValue := envValue.(int)
+		typedDefaultValue := defaultValue.(int)
+		typedFlagValue := flagValue.(int)
+		if !isZeroValue(typedEnvValue) &&
+			typedEnvValue != typedDefaultValue &&
+			typedFlagValue == typedDefaultValue &&
+			!isFlagExplicit {
+			return true
+		}
+		return false
+	case string:
+		typedEnvValue := envValue.(string)
+		typedDefaultValue := defaultValue.(string)
+		typedFlagValue := flagValue.(string)
+		if !isZeroValue(typedEnvValue) &&
+			typedEnvValue != typedDefaultValue &&
+			typedFlagValue == typedDefaultValue &&
+			!isFlagExplicit {
+			return true
+		}
+		return false
+	case uint:
+		typedEnvValue := envValue.(uint)
+		typedDefaultValue := defaultValue.(uint)
+		typedFlagValue := flagValue.(uint)
+		if !isZeroValue(typedEnvValue) &&
+			typedEnvValue != typedDefaultValue &&
+			typedFlagValue == typedDefaultValue &&
+			!isFlagExplicit {
+			return true
+		}
+		return false
+	}
+	return false
 }

@@ -1,14 +1,19 @@
 package config
 
-import "github.com/spf13/pflag"
+import (
+	"github.com/spf13/pflag"
+)
 
 // Float stores the configuration details for a floating
 // point value
 type Float struct {
-	Shorthand string
-	Usage     string
-	Default   float64
-	Value     float64
+	Shorthand    string
+	Usage        string
+	Default      float64
+	Value        float64
+	controller   *pflag.FlagSet
+	internalName string
+	isSet        bool
 }
 
 // ApplyToFlagSet applies the configuration to a provided flag set
@@ -29,6 +34,21 @@ func (s *Float) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	} else {
 		flags.Float64VarP(pointer, name, shorthand, value, usage)
 	}
+	s.controller = flags
+	s.internalName = name
+}
+
+// IsSetExplicitlyByFlag returns true if the value was set by the user even if it equals the default value
+func (s Float) IsSetExplicitlyByFlag() bool {
+	if s.controller == nil {
+		return false
+	}
+	return s.controller.Changed(s.internalName)
+}
+
+// IsSet returns ture if the value was set by the .SetValue method of this instance
+func (s Float) IsSet() bool {
+	return s.isSet
 }
 
 // GetDefault retrieves the default value of this configuration
@@ -62,4 +82,5 @@ func (s *Float) GetValue() interface{} {
 // SetValue sets the value of this configuration
 func (s *Float) SetValue(value interface{}) {
 	s.Value = value.(float64)
+	s.isSet = true
 }

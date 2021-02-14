@@ -14,8 +14,8 @@ Defining a configuration map:
 		"int_key": &config.Int{},
 		"int_slice_key": &config.IntSlice{},
 		"string_key": &config.String{},
+		"string_slice_key": &config.StringSlice{},
 		"uint_key": &config.Uint{},
-		"uint_slice_key": &config.UintSlice{},
 	}
 
 Loading environment variables (assuming conf is defined):

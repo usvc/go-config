@@ -13,5 +13,6 @@ type Config interface {
 	GetUsage() string
 	GetValue() interface{}
 	GetValuePointer() interface{}
+	IsSetExplicitlyByFlag() bool
 	SetValue(value interface{})
 }

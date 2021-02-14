@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -24,12 +23,8 @@ func GetCommand() *cobra.Command {
 	command := cobra.Command{
 		Use:     "config",
 		Version: fmt.Sprintf("%s-%s %s", Version, Commit, Timestamp),
-		// PreRun: func(command *cobra.Command, args []string) {
-		// 	conf.LoadFromEnvironment()
-		// },
 		Run: func(command *cobra.Command, args []string) {
 			log := logger{command.OutOrStdout()}
-			log.Printf("received args: \"%v\"\n", strings.Join(args, "\", \""))
 			for key, conf := range conf {
 				log.Printf("%s: %v", key, conf.GetValue())
 				length := -1

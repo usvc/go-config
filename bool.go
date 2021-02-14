@@ -7,10 +7,13 @@ import (
 // Bool represents a configuration which should be interpreted
 // as a boolean-typed value
 type Bool struct {
-	Shorthand string
-	Usage     string
-	Default   bool
-	Value     bool
+	Shorthand    string
+	Usage        string
+	Default      bool
+	Value        bool
+	controller   *pflag.FlagSet
+	internalName string
+	isSet        bool
 }
 
 // ApplyToFlagSet applies the configuration to a provided flag set
@@ -26,6 +29,21 @@ func (s *Bool) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	} else {
 		flags.BoolVarP(pointer, name, shorthand, value, usage)
 	}
+	s.controller = flags
+	s.internalName = name
+}
+
+// IsSetExplicitlyByFlag returns true if the value was set by the user even if it equals the default value
+func (s Bool) IsSetExplicitlyByFlag() bool {
+	if s.controller == nil {
+		return false
+	}
+	return s.controller.Changed(s.internalName)
+}
+
+// IsSet returns ture if the value was set by the .SetValue method of this instance
+func (s Bool) IsSet() bool {
+	return s.isSet
 }
 
 // GetDefault retrieves the default value of this configuration
@@ -59,4 +77,5 @@ func (s *Bool) GetValue() interface{} {
 // SetValue sets the value of this configuration
 func (s *Bool) SetValue(value interface{}) {
 	s.Value = value.(bool)
+	s.isSet = true
 }

@@ -105,39 +105,6 @@ func (s *UtilsTests) Test_areEqualStringSlice_unequalValue() {
 	}
 }
 
-func (s *UtilsTests) Test_areEqualUintSlice_equal() {
-	var equals = [][][]uint{
-		[][]uint{[]uint{1, 2}, []uint{1, 2}},
-		[][]uint{[]uint{2, 3}, []uint{2, 3}},
-	}
-	for _, cases := range equals {
-		s.True(areEqualUintSlice(cases[0], cases[1]))
-	}
-}
-
-func (s *UtilsTests) Test_areEqualUintSlice_unequalLength() {
-	var unequals = [][][]uint{
-		[][]uint{[]uint{1}, []uint{1, 2}},
-		[][]uint{[]uint{1, 2}, []uint{1, 2, 3}},
-		[][]uint{[]uint{2}, []uint{1, 2, 3}},
-		[][]uint{[]uint{3}, []uint{1, 2, 3}},
-		[][]uint{[]uint{2, 3}, []uint{1, 2, 3}},
-	}
-	for _, cases := range unequals {
-		s.False(areEqualUintSlice(cases[0], cases[1]))
-	}
-}
-
-func (s *UtilsTests) Test_areEqualUintSlice_unequalValue() {
-	var unequals = [][][]uint{
-		[][]uint{[]uint{1, 2}, []uint{2, 1}},
-		[][]uint{[]uint{2, 1}, []uint{1, 2}},
-	}
-	for _, cases := range unequals {
-		s.False(areEqualUintSlice(cases[0], cases[1]))
-	}
-}
-
 func (s *UtilsTests) Test_assertIDExists() {
 	expectedKey := "__not_found"
 	defer func() {
@@ -198,4 +165,13 @@ func (s *UtilsTests) Test_normalizeName_specials() {
 	for input, expected := range testCases {
 		s.Equal(expected, normalizeName(input, '_'))
 	}
+}
+
+func (s *UtilsTests) Test_shouldEnvironmentVariableBeSet() {
+	envValue := "a"
+	conf := &String{
+		Default: "a",
+		Value:   "a",
+	}
+	s.False(shouldEnvironmentVariableBeSet(envValue, conf))
 }

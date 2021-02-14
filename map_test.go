@@ -45,9 +45,7 @@ func (s *MapTests) TestLoadFromEnvironment_bool() {
 		"lfe_bool": &Bool{Default: false},
 	}
 	originalLFEBool := os.Getenv("LFE_BOOL")
-	defer func() {
-		os.Setenv("LFE_BOOL", originalLFEBool)
-	}()
+	defer os.Setenv("LFE_BOOL", originalLFEBool)
 	expectedLFEBool := true
 	os.Setenv("LFE_BOOL", "1")
 	conf.LoadFromEnvironment()
@@ -59,9 +57,7 @@ func (s *MapTests) TestLoadFromEnvironment_float() {
 		"lfe_float": &Float{Default: 3.142},
 	}
 	originalLFEFloat := os.Getenv("LFE_FLOAT")
-	defer func() {
-		os.Setenv("LFE_FLOAT", originalLFEFloat)
-	}()
+	defer os.Setenv("LFE_FLOAT", originalLFEFloat)
 	expectedLFEFloat := 1.618
 	os.Setenv("LFE_FLOAT", strconv.FormatFloat(expectedLFEFloat, 'f', 3, 64))
 	conf.LoadFromEnvironment()
@@ -73,9 +69,7 @@ func (s *MapTests) TestLoadFromEnvironment_int() {
 		"lfe_int": &Int{Default: 42},
 	}
 	originalLFEInt := os.Getenv("LFE_INT")
-	defer func() {
-		os.Setenv("LFE_INT", originalLFEInt)
-	}()
+	defer os.Setenv("LFE_INT", originalLFEInt)
 	expectedLFEInt := 43
 	os.Setenv("LFE_INT", strconv.Itoa(expectedLFEInt))
 	conf.LoadFromEnvironment()
@@ -87,9 +81,7 @@ func (s *MapTests) TestLoadFromEnvironment_string() {
 		"lfe_string": &String{Default: "default"},
 	}
 	originalLFEString := os.Getenv("LFE_STRING")
-	defer func() {
-		os.Setenv("LFE_STRING", originalLFEString)
-	}()
+	defer os.Setenv("LFE_STRING", originalLFEString)
 	expectedLFEString := "expected"
 	os.Setenv("LFE_STRING", expectedLFEString)
 	conf.LoadFromEnvironment()
@@ -192,14 +184,4 @@ func (s *MapTests) TestGetUint() {
 		expectedName: &expectedConfig,
 	}
 	s.Equal(expectedValue, conf.GetUint(expectedName))
-}
-
-func (s *MapTests) TestGetUintSlice() {
-	expectedName := "uint-slice"
-	expectedValue := []uint{12345, 67890}
-	expectedConfig := UintSlice{Value: expectedValue}
-	conf := Map{
-		expectedName: &expectedConfig,
-	}
-	s.Equal(expectedValue, conf.GetUintSlice(expectedName))
 }

@@ -1,14 +1,19 @@
 package config
 
-import "github.com/spf13/pflag"
+import (
+	"github.com/spf13/pflag"
+)
 
 // Uint represents a configuration which should be interpreted
 // as an unsigned integer
 type Uint struct {
-	Shorthand string
-	Usage     string
-	Default   uint
-	Value     uint
+	Shorthand    string
+	Usage        string
+	Default      uint
+	Value        uint
+	controller   *pflag.FlagSet
+	internalName string
+	isSet        bool
 }
 
 // ApplyToFlagSet applies the configuration to a provided flag set
@@ -29,6 +34,21 @@ func (s *Uint) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	} else {
 		flags.UintVarP(pointer, name, shorthand, value, usage)
 	}
+	s.controller = flags
+	s.internalName = name
+}
+
+// IsSetExplicitlyByFlag returns true if the value was set by the user even if it equals the default value
+func (s Uint) IsSetExplicitlyByFlag() bool {
+	if s.controller == nil {
+		return false
+	}
+	return s.controller.Changed(s.internalName)
+}
+
+// IsSet returns ture if the value was set by the .SetValue method of this instance
+func (s Uint) IsSet() bool {
+	return s.isSet
 }
 
 // GetDefault retrieves the default value of this configuration
@@ -62,4 +82,5 @@ func (s *Uint) GetValue() interface{} {
 // SetValue sets the value of this configuration
 func (s *Uint) SetValue(value interface{}) {
 	s.Value = value.(uint)
+	s.isSet = true
 }

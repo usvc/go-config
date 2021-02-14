@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -69,7 +70,7 @@ func (m *Map) LoadFromEnvironment() {
 		switch conf.(type) {
 		case *String:
 			envValue := env.GetString(envKey)
-			if envValue != defaultValue {
+			if shouldEnvironmentVariableBeSet(envValue, conf) {
 				conf.SetValue(envValue)
 			}
 		case *StringSlice:
@@ -82,27 +83,46 @@ func (m *Map) LoadFromEnvironment() {
 			if envValue != nil &&
 				!isZeroValue(envValue) &&
 				!areEqualStringSlice(envValue, defaultValue.([]string)) &&
-				areEqualStringSlice(flagValue.([]string), defaultValue.([]string)) {
+				areEqualStringSlice(flagValue.([]string), defaultValue.([]string)) &&
+				!conf.IsSetExplicitlyByFlag() {
 				conf.SetValue(envValue)
 			}
 		case *Int:
 			envValue := env.GetInt(envKey)
-			if envValue != defaultValue && !isZeroValue(envValue) {
+			if shouldEnvironmentVariableBeSet(envValue, conf) {
+				conf.SetValue(envValue)
+			}
+		case *IntSlice:
+			intStringSlice := strings.Split(env.GetString(envKey), ",")
+			var intSlice []int
+			for _, intStringValue := range intStringSlice {
+				intValue, err := strconv.Atoi(intStringValue)
+				if err == nil {
+					intSlice = append(intSlice, intValue)
+				}
+			}
+			env.Set(envKey, intSlice)
+			envValue := env.GetIntSlice(envKey)
+			if envValue != nil &&
+				!isZeroValue(envValue) &&
+				!areEqualIntSlice(envValue, defaultValue.([]int)) &&
+				areEqualIntSlice(flagValue.([]int), defaultValue.([]int)) &&
+				!conf.IsSetExplicitlyByFlag() {
 				conf.SetValue(envValue)
 			}
 		case *Uint:
 			envValue := env.GetUint(envKey)
-			if envValue != defaultValue && !isZeroValue(envValue) {
+			if shouldEnvironmentVariableBeSet(envValue, conf) {
 				conf.SetValue(envValue)
 			}
 		case *Float:
 			envValue := env.GetFloat64(envKey)
-			if envValue != defaultValue && !isZeroValue(envValue) {
+			if shouldEnvironmentVariableBeSet(envValue, conf) {
 				conf.SetValue(envValue)
 			}
 		case *Bool:
 			envValue := env.GetBool(envKey)
-			if envValue != defaultValue && !isZeroValue(envValue) {
+			if shouldEnvironmentVariableBeSet(envValue, conf) {
 				conf.SetValue(envValue)
 			}
 		}
@@ -156,12 +176,6 @@ func (m Map) GetStringSlice(id string) []string {
 // by the key :id as an unsigned integer type
 func (m Map) GetUint(id string) uint {
 	return m.Get(id).(uint)
-}
-
-// GetUintSlice retrieves the value of the configuration identified
-// by the key :id as an unsigned intger slice type
-func (m Map) GetUintSlice(id string) []uint {
-	return m.Get(id).([]uint)
 }
 
 func (m Map) Reset() error {

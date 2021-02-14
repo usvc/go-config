@@ -1,14 +1,19 @@
 package config
 
-import "github.com/spf13/pflag"
+import (
+	"github.com/spf13/pflag"
+)
 
 // IntSlice represents a configuration which should be interpreted
 // as a slice of signed integers
 type IntSlice struct {
-	Shorthand string
-	Usage     string
-	Default   []int
-	Value     []int
+	Shorthand    string
+	Usage        string
+	Default      []int
+	Value        []int
+	controller   *pflag.FlagSet
+	internalName string
+	isSet        bool
 }
 
 // ApplyToFlagSet applies the configuration to a provided flag set
@@ -29,6 +34,21 @@ func (s *IntSlice) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	} else {
 		flags.IntSliceVarP(pointer, name, shorthand, value, usage)
 	}
+	s.controller = flags
+	s.internalName = name
+}
+
+// IsSetExplicitlyByFlag returns true if the value was set by the user even if it equals the default value
+func (s IntSlice) IsSetExplicitlyByFlag() bool {
+	if s.controller == nil {
+		return false
+	}
+	return s.controller.Changed(s.internalName)
+}
+
+// IsSet returns ture if the value was set by the .SetValue method of this instance
+func (s IntSlice) IsSet() bool {
+	return s.isSet
 }
 
 // GetDefault retrieves the default value of this configuration
@@ -62,4 +82,5 @@ func (s *IntSlice) GetValue() interface{} {
 // SetValue sets the value of this configuration
 func (s *IntSlice) SetValue(value interface{}) {
 	s.Value = value.([]int)
+	s.isSet = true
 }

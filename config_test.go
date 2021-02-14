@@ -15,12 +15,16 @@ func TestConfig(t *testing.T) {
 }
 
 func (s *ConfigTests) TestTypes() {
-	var conf Config
-	conf = &Int{}
-	conf = &IntSlice{}
-	conf = &String{}
-	conf = &StringSlice{}
-	conf = &Uint{}
-	conf = &UintSlice{}
-	s.Nil(conf.GetValue())
+	confTypes := []Config{
+		&Bool{},
+		&Float{},
+		&Int{},
+		&IntSlice{},
+		&String{},
+		&StringSlice{},
+		&Uint{},
+	}
+	for _, confType := range confTypes {
+		s.Zero(confType.GetValue())
+	}
 }

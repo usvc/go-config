@@ -7,10 +7,13 @@ import (
 // StringSlice represents a configuration which should be represented
 // as a slice of strings
 type StringSlice struct {
-	Shorthand string
-	Usage     string
-	Default   []string
-	Value     []string
+	Shorthand    string
+	Usage        string
+	Default      []string
+	Value        []string
+	controller   *pflag.FlagSet
+	internalName string
+	isSet        bool
 }
 
 // // ApplyToFlagSet applies the configuration to a provided flag set
@@ -31,6 +34,21 @@ func (s *StringSlice) ApplyToFlagSet(name string, flags *pflag.FlagSet) {
 	} else {
 		flags.StringSliceVarP(pointer, name, shorthand, value, usage)
 	}
+	s.controller = flags
+	s.internalName = name
+}
+
+// IsSetExplicitlyByFlag returns true if the value was set by the user even if it equals the default value
+func (s StringSlice) IsSetExplicitlyByFlag() bool {
+	if s.controller == nil {
+		return false
+	}
+	return s.controller.Changed(s.internalName)
+}
+
+// IsSet returns ture if the value was set by the .SetValue method of this instance
+func (s StringSlice) IsSet() bool {
+	return s.isSet
 }
 
 // GetDefault retrieves the default value of this configuration
@@ -64,4 +82,5 @@ func (s *StringSlice) GetValue() interface{} {
 // SetValue sets the value of this configuration
 func (s *StringSlice) SetValue(value interface{}) {
 	s.Value = value.([]string)
+	s.isSet = true
 }
